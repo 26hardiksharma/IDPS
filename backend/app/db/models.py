@@ -117,6 +117,9 @@ class AnalysisRun(Base):
     incidents: Mapped[list["Incident"]] = relationship(
         back_populates="run", cascade="all, delete-orphan"
     )
+    anomaly_model: Mapped[Optional["ModelVersion"]] = relationship(
+        back_populates="runs"
+    )
 
 
 class Evidence(Base):
