@@ -60,6 +60,10 @@ async def create_run(
     """
     settings = get_settings()
     input_path = Path(input_path_str)
+    if not input_path.exists() and not input_path.is_absolute():
+        candidate = settings.PCAP_ROOT / input_path
+        if candidate.exists():
+            input_path = candidate
 
     # ── Input validation ──────────────────────────────────────────────────────
     if not input_path.exists():
