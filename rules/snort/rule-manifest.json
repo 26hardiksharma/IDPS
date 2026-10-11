@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "rules": [
+    {
+      "rule_id": "1:9000001",
+      "stable_id": "XAI-RULE-001",
+      "sid": 9000001,
+      "rev": 1,
+      "version": "1.0",
+      "description": "Port Scan Indicator - TCP SYN burst",
+      "scenario": "port_scan",
+      "classification": "attempted-recon",
+      "priority": 2,
+      "status": "active",
+      "fixture_tests": [
+        {"pcap": "fixtures/port_scan_positive.pcap", "expected": "alert"},
+        {"pcap": "fixtures/benign_traffic.pcap", "expected": "no_alert"}
+      ],
+      "created": "2026-10-12"
+    },
+    {
+      "rule_id": "1:9000002",
+      "stable_id": "XAI-RULE-002",
+      "sid": 9000002,
+      "rev": 1,
+      "version": "1.0",
+      "description": "Suspicious DNS Query Rate",
+      "scenario": "dns_anomaly",
+      "classification": "policy-violation",
+      "priority": 3,
+      "status": "active",
+      "fixture_tests": [
+        {"pcap": "fixtures/dns_flood_positive.pcap", "expected": "alert"},
+        {"pcap": "fixtures/benign_traffic.pcap", "expected": "no_alert"}
+      ],
+      "created": "2026-10-12"
+    },
+    {
+      "rule_id": "1:9000003",
+      "stable_id": "XAI-RULE-003",
+      "sid": 9000003,
+      "rev": 1,
+      "version": "1.0",
+      "description": "Long DNS Query Label",
+      "scenario": "dns_anomaly",
+      "classification": "policy-violation",
+      "priority": 3,
+      "status": "active",
+      "fixture_tests": [
+        {"pcap": "fixtures/dns_tunnel_positive.pcap", "expected": "alert"},
+        {"pcap": "fixtures/benign_traffic.pcap", "expected": "no_alert"}
+      ],
+      "created": "2026-10-12"
+    },
+    {
+      "rule_id": "1:9000004",
+      "stable_id": "XAI-RULE-004",
+      "sid": 9000004,
+      "rev": 1,
+      "version": "1.0",
+      "description": "Repeated SSH Connection Attempts",
+      "scenario": "repeated_connection",
+      "classification": "attempted-admin",
+      "priority": 2,
+      "status": "active",
+      "fixture_tests": [
+        {"pcap": "fixtures/ssh_brute_positive.pcap", "expected": "alert"},
+        {"pcap": "fixtures/benign_traffic.pcap", "expected": "no_alert"}
+      ],
+      "created": "2026-10-12"
+    },
+    {
+      "rule_id": "1:9000005",
+      "stable_id": "XAI-RULE-005",
+      "sid": 9000005,
+      "rev": 1,
+      "version": "1.0",
+      "description": "Repeated RDP Connection Attempts",
+      "scenario": "repeated_connection",
+      "classification": "attempted-admin",
+      "priority": 2,
+      "status": "active",
+      "fixture_tests": [
+        {"pcap": "fixtures/rdp_brute_positive.pcap", "expected": "alert"},
+        {"pcap": "fixtures/benign_traffic.pcap", "expected": "no_alert"}
+      ],
+      "created": "2026-10-12"
+    }
+  ]
+}

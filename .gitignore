@@ -1,0 +1,65 @@
+# XAI-IDPS .gitignore
+
+# ── Secrets and local config ───────────────────────────────────────────────
+.env
+*.env.local
+
+# ── Data files (never commit PCAPs or SQLite DB) ───────────────────────────
+data/pcaps/
+data/outputs/
+data/corpus/
+data/*.db
+data/*.db-shm
+data/*.db-wal
+*.pcap
+*.pcapng
+*.cap
+
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# ── Node / Frontend ────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+frontend/.env.local
+frontend/.env.production
+
+# ── IDE ────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
+
+# ── ML model artifacts ─────────────────────────────────────────────────────
+*.pkl
+*.joblib
+*.h5
+*.onnx
+
+# ── Reports and large outputs ──────────────────────────────────────────────
+reports/results/*.json
+reports/results/*.csv
+
+# ── Snort output ───────────────────────────────────────────────────────────
+data/outputs/snort/

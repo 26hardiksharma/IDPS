@@ -1,0 +1,90 @@
+# XAI-IDPS Custom Snort 3 Rules
+# Rule lifecycle: Draft → Static Validation → Fixture Testing → Review → Approval
+# Each rule has a stable SID. To revise, increment the rev number and register
+# the new version in the provenance store.
+#
+# WARNING: These rules are for academic lab use with approved test PCAPs only.
+# Do not deploy to a production or campus network.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario A: Port-scan-like behavior
+# Detect TCP SYN packets to many destination ports from one source.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Rule A.1: Rapid TCP SYN to sequential ports (basic scan indicator)
+# SID 9000001 rev 1
+alert tcp any any -> $HOME_NET any (
+    msg:"XAI-IDPS Port Scan Indicator - TCP SYN burst";
+    flags:S;
+    flow:stateless;
+    detection_filter:track by_src, count 20, seconds 30;
+    sid:9000001;
+    rev:1;
+    classtype:attempted-recon;
+    priority:2;
+    metadata:rule_set xai_idps, scenario port_scan;
+)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario B: Suspicious DNS behavior
+# High-frequency DNS queries from one source — possible tunneling or DGA.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Rule B.1: DNS query rate detection
+# SID 9000002 rev 1
+alert udp any any -> any 53 (
+    msg:"XAI-IDPS Suspicious DNS Query Rate";
+    content:"|01 00|";  offset:2; depth:2;  # Standard query flag
+    detection_filter:track by_src, count 30, seconds 30;
+    sid:9000002;
+    rev:1;
+    classtype:policy-violation;
+    priority:3;
+    metadata:rule_set xai_idps, scenario dns_anomaly;
+)
+
+# Rule B.2: Long DNS query labels (potential tunneling indicator)
+# SID 9000003 rev 1
+alert udp any any -> any 53 (
+    msg:"XAI-IDPS Long DNS Query Label";
+    content:"|01 00|";  offset:2; depth:2;
+    dsize:>100;
+    sid:9000003;
+    rev:1;
+    classtype:policy-violation;
+    priority:3;
+    metadata:rule_set xai_idps, scenario dns_anomaly;
+)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scenario C: Repeated connection behavior
+# Many TCP connection attempts to the same destination port.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Rule C.1: Repeated connection attempts to SSH
+# SID 9000004 rev 1
+alert tcp any any -> $HOME_NET 22 (
+    msg:"XAI-IDPS Repeated SSH Connection Attempts";
+    flags:S;
+    flow:stateless;
+    detection_filter:track by_src, count 10, seconds 60;
+    sid:9000004;
+    rev:1;
+    classtype:attempted-admin;
+    priority:2;
+    metadata:rule_set xai_idps, scenario repeated_connection;
+)
+
+# Rule C.2: Repeated connection attempts to RDP
+# SID 9000005 rev 1
+alert tcp any any -> $HOME_NET 3389 (
+    msg:"XAI-IDPS Repeated RDP Connection Attempts";
+    flags:S;
+    flow:stateless;
+    detection_filter:track by_src, count 10, seconds 60;
+    sid:9000005;
+    rev:1;
+    classtype:attempted-admin;
+    priority:2;
+    metadata:rule_set xai_idps, scenario repeated_connection;
+)

@@ -1,0 +1,36 @@
+# XAI-IDPS Backend Dependencies
+# Pin versions for reproducibility; update only with documented rationale.
+
+# ── Web framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# ── Data validation ───────────────────────────────────────────────────────────
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# ── Database ──────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.35
+aiosqlite==0.20.0
+alembic==1.13.3
+
+# ── HTTP client (for Ollama) ──────────────────────────────────────────────────
+httpx==0.27.2
+
+# ── Packet analysis ───────────────────────────────────────────────────────────
+scapy==2.5.0
+
+# ── Anomaly detection ─────────────────────────────────────────────────────────
+scikit-learn==1.5.2
+numpy==2.1.1
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+structlog==24.4.0
+
+# ── ID generation ─────────────────────────────────────────────────────────────
+python-ulid==2.7.0
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest==8.3.3
+pytest-asyncio==0.24.0
+httpx==0.27.2
