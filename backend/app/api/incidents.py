@@ -264,11 +264,16 @@ async def create_response_simulation(
         except (json.JSONDecodeError, TypeError):
             result_data = None
 
+    sim_status = (
+        audit.simulation_status.value
+        if hasattr(audit.simulation_status, "value")
+        else str(audit.simulation_status)
+    )
     return SimulationResponse(
         simulation_id=audit.id,
         incident_id=audit.incident_id,
         proposed_action=audit.proposed_action,
-        simulation_status=audit.simulation_status.value,
+        simulation_status=sim_status,
         simulated_only=audit.simulated_only,
         policy_decision=audit.policy_decision,
         result_json=result_data,

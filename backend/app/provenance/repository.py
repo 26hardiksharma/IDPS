@@ -6,7 +6,7 @@ Business logic stays in service modules; this layer only handles I/O.
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Sequence
 
 from sqlalchemy import select
@@ -23,8 +23,10 @@ from app.db.models import (
     ExplanationCitation,
     Incident,
     IncidentDetection,
+    IncidentStatus,
     ResponseAudit,
     RunStatus,
+    SimulationStatus,
 )
 from app.provenance.id_factory import new_id
 
@@ -87,9 +89,9 @@ class ProvenanceRepository:
         if error_summary is not None:
             run.error_summary = error_summary
         if status == RunStatus.running and run.started_at is None:
-            run.started_at = datetime.utcnow()
+            run.started_at = datetime.now(timezone.utc).replace(tzinfo=None)
         if status in (RunStatus.completed, RunStatus.failed, RunStatus.cancelled):
-            run.finished_at = datetime.utcnow()
+            run.finished_at = datetime.now(timezone.utc).replace(tzinfo=None)
         if snort_version:
             run.snort_version = snort_version
         if snort_config_hash:
@@ -275,7 +277,10 @@ class ProvenanceRepository:
     ) -> Sequence[Incident]:
         stmt = (
             select(Incident)
-            .options(selectinload(Incident.detection_links))
+            .options(
+                selectinload(Incident.detection_links),
+                selectinload(Incident.explanations),
+            )
             .order_by(Incident.created_at.desc())
         )
         if run_id:
@@ -289,9 +294,11 @@ class ProvenanceRepository:
         return result.scalars().all()
 
     async def update_incident_status(
-        self, incident_id: str, status: str
+        self, incident_id: str, status: str | IncidentStatus
     ) -> Incident:
         inc = await self.get_incident(incident_id)
+        if isinstance(status, str):
+            status = IncidentStatus(status)
         inc.status = status
         await self._db.flush()
         return inc
@@ -367,6 +374,11 @@ class ProvenanceRepository:
         actor: str | None = None,
         result_json: dict | None = None,
     ) -> ResponseAudit:
+        if isinstance(simulation_status, str):
+            try:
+                simulation_status = SimulationStatus(simulation_status)
+            except ValueError:
+                pass
         audit = ResponseAudit(
             id=new_id("audt"),
             incident_id=incident_id,

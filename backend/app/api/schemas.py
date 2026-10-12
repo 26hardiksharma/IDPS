@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # ── Common ────────────────────────────────────────────────────────────────────
@@ -80,6 +80,8 @@ class EvidenceResponse(BaseModel):
 # ── Incidents ─────────────────────────────────────────────────────────────────
 
 class DetectionSummary(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     detection_id: str
     detector_type: str
     detector_name: str
@@ -132,6 +134,8 @@ class UpdateIncidentStatusRequest(BaseModel):
 # ── Explanations ──────────────────────────────────────────────────────────────
 
 class ExplanationResponse(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     explanation_id: str
     incident_id: str
     model_id: str
