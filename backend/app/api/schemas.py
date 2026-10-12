@@ -180,10 +180,13 @@ class SimulationResponse(BaseModel):
     simulation_id: str
     incident_id: str
     proposed_action: str
+    action_target: Optional[str] = None
+    action_scope: Optional[str] = None
     simulation_status: str
     simulated_only: bool = True
-    policy_decision: Optional[str]
-    result_json: Optional[Any]
+    policy_decision: Optional[str] = None
+    actor: Optional[str] = None
+    result_json: Optional[Any] = None
     created_at: datetime
 
 

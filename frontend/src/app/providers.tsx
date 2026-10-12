@@ -7,10 +7,10 @@ import { Toaster } from "sonner";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <QueryProvider>
         {children}
-        <Toaster richColors position="top-right" />
+        <Toaster richColors closeButton position="top-right" />
       </QueryProvider>
     </ThemeProvider>
   );

@@ -13,7 +13,8 @@ export function AppSidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "flex flex-col w-64 border-r border-border bg-card shrink-0 select-none",
+        "flex flex-col w-64 border-r shrink-0 select-none",
+        "bg-sidebar text-sidebar-foreground border-sidebar-border",
         className
       )}
     >

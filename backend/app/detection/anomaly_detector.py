@@ -63,6 +63,19 @@ def score_features(
     return results
 
 
+import math
+
+def _safe_float(val: Any, default: float = 0.0) -> float:
+    """Safely convert value to finite float; return default for missing/non-finite."""
+    if val is None:
+        return default
+    try:
+        f = float(val)
+        return f if math.isfinite(f) else default
+    except (ValueError, TypeError):
+        return default
+
+
 def _score_one(
     rec: dict[str, Any],
     config: dict[str, Any],
@@ -70,46 +83,53 @@ def _score_one(
     """
     Apply threshold rules to a single feature record.
     Each triggered threshold contributes a fractional score component.
-    Score is capped at 1.0.
+    Score is capped at 1.0. Non-finite or missing features are safely defaulted.
     """
     triggers: list[str] = []
     score_parts: list[float] = []
 
     # Port scan indicator
-    max_ports: int = config.get("distinct_dst_ports", 20)
-    if rec.get("distinct_dst_ports", 0) >= max_ports:
-        triggers.append(f"distinct_dst_ports>={max_ports}")
-        ratio = min(rec["distinct_dst_ports"] / max(max_ports, 1), 3.0) / 3.0
+    max_ports: float = _safe_float(config.get("distinct_dst_ports"), 20.0)
+    ports: float = _safe_float(rec.get("distinct_dst_ports"), 0.0)
+    if ports >= max_ports and max_ports > 0:
+        triggers.append(f"distinct_dst_ports>={int(max_ports)}")
+        ratio = min(ports / max(max_ports, 1.0), 3.0) / 3.0
         score_parts.append(0.40 * min(ratio, 1.0))
 
     # Packet rate (packets per window)
-    max_pkt: float = config.get("max_packet_count", 500)
-    if rec.get("packet_count", 0) >= max_pkt:
-        triggers.append(f"packet_count>={max_pkt}")
-        ratio = min(rec["packet_count"] / max(max_pkt, 1), 3.0) / 3.0
+    max_pkt: float = _safe_float(config.get("max_packet_count"), 500.0)
+    pkts: float = _safe_float(rec.get("packet_count"), 0.0)
+    if pkts >= max_pkt and max_pkt > 0:
+        triggers.append(f"packet_count>={int(max_pkt)}")
+        ratio = min(pkts / max(max_pkt, 1.0), 3.0) / 3.0
         score_parts.append(0.20 * min(ratio, 1.0))
 
     # DNS query rate
-    max_dns: int = config.get("dns_query_count", 30)
-    if rec.get("dns_query_count", 0) >= max_dns:
-        triggers.append(f"dns_query_count>={max_dns}")
-        ratio = min(rec["dns_query_count"] / max(max_dns, 1), 3.0) / 3.0
+    max_dns: float = _safe_float(config.get("dns_query_count"), 30.0)
+    dns_cnt: float = _safe_float(rec.get("dns_query_count"), 0.0)
+    if dns_cnt >= max_dns and max_dns > 0:
+        triggers.append(f"dns_query_count>={int(max_dns)}")
+        ratio = min(dns_cnt / max(max_dns, 1.0), 3.0) / 3.0
         score_parts.append(0.25 * min(ratio, 1.0))
 
     # DNS label entropy
-    max_entropy: float = config.get("dns_label_entropy", 3.5)
-    if rec.get("max_dns_label_entropy", 0.0) >= max_entropy:
+    max_entropy: float = _safe_float(config.get("dns_label_entropy"), 3.5)
+    entropy: float = _safe_float(rec.get("max_dns_label_entropy"), 0.0)
+    if entropy >= max_entropy and max_entropy > 0:
         triggers.append(f"dns_label_entropy>={max_entropy}")
-        ratio = min(rec["max_dns_label_entropy"] / max(max_entropy, 0.01), 3.0) / 3.0
+        ratio = min(entropy / max(max_entropy, 0.01), 3.0) / 3.0
         score_parts.append(0.15 * min(ratio, 1.0))
 
     anomaly_score = round(min(sum(score_parts), 1.0), 4)
     is_anomalous = bool(triggers)
 
+    src_ip_val = rec.get("src_ip")
+    src_ip = str(src_ip_val) if src_ip_val is not None else "unknown"
+
     return AnomalyResult(
-        src_ip=rec.get("src_ip", "unknown"),
-        window_start=rec.get("window_start", 0),
-        window_end=rec.get("window_end", 0),
+        src_ip=src_ip,
+        window_start=int(_safe_float(rec.get("window_start"), 0.0)),
+        window_end=int(_safe_float(rec.get("window_end"), 0.0)),
         anomaly_score=anomaly_score,
         is_anomalous=is_anomalous,
         triggered_thresholds=triggers,

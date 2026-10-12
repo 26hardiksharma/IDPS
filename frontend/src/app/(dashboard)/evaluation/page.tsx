@@ -156,10 +156,14 @@ export default function EvaluationPage() {
                   <Tooltip
                     formatter={(val) => [`${(Number(val) * 100).toFixed(1)}%`, ""]}
                     contentStyle={{
-                      backgroundColor: "var(--color-card)",
-                      borderColor: "var(--color-border)",
+                      backgroundColor: "var(--card)",
+                      borderColor: "var(--border)",
                       borderRadius: "0.5rem",
                       fontSize: "12px",
+                      color: "var(--card-foreground)",
+                    }}
+                    itemStyle={{
+                      color: "var(--card-foreground)",
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />

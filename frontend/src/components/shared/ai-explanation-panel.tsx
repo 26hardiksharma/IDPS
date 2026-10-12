@@ -27,6 +27,7 @@ export function AiExplanationPanel({
     onSuccess: () => {
       toast.success("AI Explanation generated & validated against evidence.");
       queryClient.invalidateQueries({ queryKey: ["incident-detail", incidentId] });
+      queryClient.invalidateQueries({ queryKey: ["incident-explanations", incidentId] });
       if (onRefresh) onRefresh();
     },
     onError: (err: unknown) => {

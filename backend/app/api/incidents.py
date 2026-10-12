@@ -141,6 +141,46 @@ async def update_incident_status(
     inc = await repo.update_incident_status(incident_id, body.status)
     return {"incident_id": inc.id, "status": inc.status.value}
 
+@router.get("/{incident_id}/explanations", response_model=list[ExplanationResponse])
+async def list_incident_explanations(
+    incident_id: str,
+    db: DbDep,
+) -> list[ExplanationResponse]:
+    """Return all explanations for a given incident, newest first."""
+    repo = ProvenanceRepository(db)
+    inc = await repo.get_incident(incident_id)
+
+    result = []
+    for exp in sorted(inc.explanations, key=lambda e: e.created_at, reverse=True):
+        vo = None
+        if exp.validated_output:
+            try:
+                vo = json.loads(exp.validated_output)
+            except (json.JSONDecodeError, TypeError):
+                vo = None
+
+        vf = None
+        if exp.validation_findings:
+            try:
+                vf = json.loads(exp.validation_findings)
+            except (json.JSONDecodeError, TypeError):
+                vf = None
+
+        result.append(
+            ExplanationResponse(
+                explanation_id=exp.id,
+                incident_id=exp.incident_id,
+                model_id=exp.model_id,
+                prompt_version=exp.prompt_version,
+                validation_status=exp.validation_status.value,
+                validated_output=vo,
+                validation_findings=vf,
+                llm_latency_ms=exp.llm_latency_ms,
+                created_at=exp.created_at,
+            )
+        )
+    return result
+
 
 @router.post("/{incident_id}/explanations", response_model=ExplanationResponse, status_code=201)
 async def generate_incident_explanation(
@@ -273,9 +313,12 @@ async def create_response_simulation(
         simulation_id=audit.id,
         incident_id=audit.incident_id,
         proposed_action=audit.proposed_action,
+        action_target=audit.action_target,
+        action_scope=audit.action_scope,
         simulation_status=sim_status,
         simulated_only=audit.simulated_only,
         policy_decision=audit.policy_decision,
+        actor=audit.actor,
         result_json=result_data,
         created_at=audit.created_at,
     )

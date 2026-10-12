@@ -54,6 +54,15 @@ export async function generateExplanation(
   return response.data;
 }
 
+export async function fetchIncidentExplanations(
+  incidentId: string
+): Promise<ExplanationResponse[]> {
+  const response = await apiClient.get<ExplanationResponse[]>(
+    API_ENDPOINTS.incidents.explanations(incidentId)
+  );
+  return response.data;
+}
+
 export async function fetchExplanation(
   explanationId: string
 ): Promise<ExplanationResponse> {

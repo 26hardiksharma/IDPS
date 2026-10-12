@@ -22,6 +22,7 @@ def can_transition(current: RunStatus, target: RunStatus) -> bool:
 
 def assert_transition(current: RunStatus, target: RunStatus) -> None:
     if not can_transition(current, target):
-        raise ValueError(
+        from app.core.errors import ConflictError
+        raise ConflictError(
             f"Invalid run state transition: {current.value} → {target.value}"
         )

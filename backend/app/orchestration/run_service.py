@@ -309,12 +309,19 @@ async def execute_run(run_id: str, db: AsyncSession) -> dict[str, Any]:
                 )
 
     # ── Finalise run status ───────────────────────────────────────────────────
-    if snort_errors and anomaly_errors:
-        # Both paths failed
+    # ── Finalise run status ───────────────────────────────────────────────────
+    if run.detector_mode == "signature" and snort_errors:
+        final_status = RunStatus.failed
+        error_summary = "; ".join(snort_errors)
+    elif run.detector_mode == "anomaly" and anomaly_errors:
+        final_status = RunStatus.failed
+        error_summary = "; ".join(anomaly_errors)
+    elif snort_errors and anomaly_errors:
+        # Both paths failed in hybrid mode
         final_status = RunStatus.failed
         error_summary = "; ".join(snort_errors + anomaly_errors)
     elif snort_errors or anomaly_errors:
-        # Partial success
+        # Partial success in hybrid mode
         final_status = RunStatus.completed
         error_summary = "Partial failure: " + "; ".join(snort_errors + anomaly_errors)
     else:

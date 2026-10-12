@@ -14,6 +14,7 @@ import { SimulationBanner } from "@/components/shared/simulation-banner";
 import {
   fetchIncidentDetail,
   updateIncidentStatus,
+  fetchIncidentExplanations,
 } from "@/lib/api/services/incidents";
 import { submitResponseSimulation } from "@/lib/api/services/simulations";
 import { SAMPLE_INCIDENTS } from "@/lib/fixtures/sample-data";
@@ -48,6 +49,19 @@ export default function IncidentDetailPage({
     queryFn: () => fetchIncidentDetail(incidentId),
     retry: 1,
   });
+
+  const { data: explanationsData, refetch: refetchExplanations } = useQuery({
+    queryKey: ["incident-explanations", incidentId],
+    queryFn: () => fetchIncidentExplanations(incidentId),
+    retry: 1,
+    enabled: Boolean(!isError),
+  });
+
+  const latestExplanation = explanationsData && explanationsData.length > 0
+    ? explanationsData.reduce((a, b) =>
+        new Date(a.created_at) > new Date(b.created_at) ? a : b
+      )
+    : null;
 
   const statusMutation = useMutation({
     mutationFn: (newStatus: IncidentStatus) =>
@@ -255,8 +269,8 @@ export default function IncidentDetailPage({
         {/* AI Explanation Panel */}
         <AiExplanationPanel
           incidentId={incidentId}
-          explanation={null}
-          onRefresh={() => refetch()}
+          explanation={latestExplanation ?? null}
+          onRefresh={() => { refetch(); refetchExplanations(); }}
         />
 
         {/* Navigation Tabs for Details */}

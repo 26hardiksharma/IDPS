@@ -59,20 +59,36 @@ def normalize_snort_alert(alert: dict[str, Any]) -> NormalizedDetection:
     priority = rule_info.get("priority", 3)
 
     rule_id = f"{gid}:{sid}:{rev}" if sid else None
-    severity = _SEVERITY_MAP.get(int(priority), "medium")
+    try:
+        priority_int = int(priority) if priority is not None else 3
+    except (ValueError, TypeError):
+        priority_int = 3
+    severity = _SEVERITY_MAP.get(priority_int, "medium")
+
+    def _safe_port(val: Any) -> int | None:
+        if val is None:
+            return None
+        try:
+            p = int(val)
+            return p if 0 <= p <= 65535 else None
+        except (ValueError, TypeError):
+            return None
 
     # Bounded raw excerpt (max 500 chars)
     import json as _json
-    raw_excerpt = _json.dumps(alert)[:500]
+    try:
+        raw_excerpt = _json.dumps(alert)[:500]
+    except Exception:
+        raw_excerpt = str(alert)[:500]
 
     return NormalizedDetection(
         detector_type="signature",
         detector_name="snort3",
-        event_time=alert.get("timestamp"),
-        src_ip=alert.get("src_addr"),
-        dst_ip=alert.get("dst_addr"),
-        src_port=alert.get("src_port"),
-        dst_port=alert.get("dst_port"),
+        event_time=str(alert.get("timestamp")) if alert.get("timestamp") else None,
+        src_ip=str(alert.get("src_addr")) if alert.get("src_addr") else None,
+        dst_ip=str(alert.get("dst_addr")) if alert.get("dst_addr") else None,
+        src_port=_safe_port(alert.get("src_port")),
+        dst_port=_safe_port(alert.get("dst_port")),
         protocol=str(alert.get("proto", "")).upper() or None,
         severity=severity,
         score=None,
