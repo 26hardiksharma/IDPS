@@ -50,7 +50,7 @@ XAI-IDPS is a local-first academic intrusion detection and response simulation p
 
 2. (Recommended) Create and activate a virtual environment:
    ```powershell
-   python -m venv .venv
+   py -3.13 -m venv .venv
    .\.venv\Scripts\Activate.ps1
    ```
 
@@ -67,13 +67,13 @@ XAI-IDPS is a local-first academic intrusion detection and response simulation p
 
 5. Generate synthetic lab PCAP fixtures (if not already generated):
    ```bash
-   python -m app.detection.generate_fixtures
+   py -3.13 -m app.detection.generate_fixtures
    ```
    *Creates `port_scan.pcap`, `dns_anomaly.pcap`, `brute_force.pcap`, and `benign.pcap` in `data/pcaps`.*
 
 6. Start the FastAPI backend server:
    ```bash
-   python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+   py -3.13 -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
    ```
    - API Docs: `http://127.0.0.1:8000/api/docs`
    - Health check: `http://127.0.0.1:8000/health`
