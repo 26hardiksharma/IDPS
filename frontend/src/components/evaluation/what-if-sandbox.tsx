@@ -51,26 +51,26 @@ export function WhatIfSandbox() {
   const getSeverityBadgeClass = (sev: string) => {
     switch (sev.toLowerCase()) {
       case "critical":
-        return "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30";
+        return "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20";
       case "high":
-        return "bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30";
+        return "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20";
       case "medium":
-        return "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30";
+        return "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20";
       default:
-        return "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30";
+        return "bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/20";
     }
   };
 
   return (
     <Card className="border-border">
-      <CardHeader className="pb-3 border-b bg-muted/20">
+      <CardHeader className="pb-3 border-b border-border bg-muted/20">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="rounded-md bg-blue-500/10 p-1.5 text-blue-600 dark:text-blue-400">
+            <div className="rounded-md border border-border bg-card p-1.5 text-muted-foreground">
               <Sliders className="size-4" />
             </div>
             <div>
-              <CardTitle className="text-base font-semibold">
+              <CardTitle className="text-sm font-semibold">
                 Interactive &quot;What-If&quot; Policy Calibration Sandbox
               </CardTitle>
               <CardDescription className="text-xs">
@@ -92,7 +92,7 @@ export function WhatIfSandbox() {
               size="sm"
               onClick={() => mutation.mutate()}
               disabled={mutation.isPending}
-              className="gap-1.5 text-xs h-7 bg-blue-600 hover:bg-blue-700 text-white"
+              className="gap-1.5 text-xs h-7"
             >
               <Play className="size-3 fill-current" />
               {mutation.isPending ? "Evaluating..." : "Run Calibration"}
@@ -125,10 +125,10 @@ export function WhatIfSandbox() {
             </div>
           </div>
 
-          <div className="rounded-lg border bg-muted/20 p-3 space-y-2">
+          <div className="rounded-lg border border-border bg-card p-3 space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="font-medium text-foreground">Anomaly Engine Weight</span>
-              <span className="font-mono font-bold text-amber-600 dark:text-amber-400">{anomWeight} pts</span>
+              <span className="font-mono font-bold text-foreground">{anomWeight} pts</span>
             </div>
             <input
               type="range"
@@ -137,19 +137,19 @@ export function WhatIfSandbox() {
               step={5}
               value={anomWeight}
               onChange={(e) => setAnomWeight(Number(e.target.value))}
-              className="w-full accent-amber-500 cursor-pointer h-1.5 bg-muted rounded-lg"
+              className="w-full accent-primary cursor-pointer h-1.5 bg-muted rounded-lg"
             />
-            <div className="text-[10px] text-muted-foreground flex justify-between">
-              <span>Low Sensitivity (10)</span>
+            <div className="text-[10px] text-muted-foreground flex justify-between font-mono">
+              <span>Low (10)</span>
               <span>Default (30)</span>
-              <span>High Sensitivity (60)</span>
+              <span>High (60)</span>
             </div>
           </div>
 
-          <div className="rounded-lg border bg-muted/20 p-3 space-y-2">
+          <div className="rounded-lg border border-border bg-card p-3 space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="font-medium text-foreground">Corroboration Bonus</span>
-              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{corrobBonus} pts</span>
+              <span className="font-mono font-bold text-foreground">{corrobBonus} pts</span>
             </div>
             <input
               type="range"
@@ -158,22 +158,22 @@ export function WhatIfSandbox() {
               step={5}
               value={corrobBonus}
               onChange={(e) => setCorrobBonus(Number(e.target.value))}
-              className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-muted rounded-lg"
+              className="w-full accent-primary cursor-pointer h-1.5 bg-muted rounded-lg"
             />
-            <div className="text-[10px] text-muted-foreground flex justify-between">
-              <span>No Bonus (0)</span>
+            <div className="text-[10px] text-muted-foreground flex justify-between font-mono">
+              <span>None (0)</span>
               <span>Default (10)</span>
-              <span>High Multiplier (25)</span>
+              <span>High (25)</span>
             </div>
           </div>
         </div>
 
         {/* Results Comparison */}
         {result ? (
-          <div className="space-y-4 pt-2 border-t">
+          <div className="space-y-4 pt-2 border-t border-border">
             <div className="flex items-center justify-between">
               <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <CheckCircle2 className="size-4 text-emerald-500" />
+                <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
                 Recalibration Results ({result.total_evaluated} Incidents Evaluated)
               </div>
               <span className="text-[11px] font-mono text-muted-foreground">
@@ -183,15 +183,15 @@ export function WhatIfSandbox() {
 
             {/* Distribution Shift Bar */}
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-md border p-3 space-y-2">
-                <div className="text-xs font-medium text-muted-foreground">
+              <div className="rounded-md border border-border bg-card p-3 space-y-2">
+                <div className="text-xs font-mono font-medium text-muted-foreground">
                   Baseline Policy Distribution
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-center">
                   {(["critical", "high", "medium", "low"] as const).map((sev) => (
                     <div key={sev} className={`rounded p-1.5 border text-xs ${getSeverityBadgeClass(sev)}`}>
-                      <div className="text-[10px] font-semibold uppercase">{sev}</div>
-                      <div className="text-base font-bold font-mono">
+                      <div className="text-[10px] font-mono uppercase">{sev}</div>
+                      <div className="text-base font-semibold font-mono">
                         {result.before_distribution[sev] || 0}
                       </div>
                     </div>
@@ -199,15 +199,15 @@ export function WhatIfSandbox() {
                 </div>
               </div>
 
-              <div className="rounded-md border p-3 space-y-2 bg-blue-500/5 border-blue-500/30">
-                <div className="text-xs font-medium text-blue-700 dark:text-blue-300">
+              <div className="rounded-md border border-primary/25 bg-primary/5 p-3 space-y-2">
+                <div className="text-xs font-mono font-medium text-foreground">
                   Calibrated Policy Distribution (Simulated)
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-center">
                   {(["critical", "high", "medium", "low"] as const).map((sev) => (
                     <div key={sev} className={`rounded p-1.5 border text-xs ${getSeverityBadgeClass(sev)}`}>
-                      <div className="text-[10px] font-semibold uppercase">{sev}</div>
-                      <div className="text-base font-bold font-mono">
+                      <div className="text-[10px] font-mono uppercase">{sev}</div>
+                      <div className="text-base font-semibold font-mono">
                         {result.after_distribution[sev] || 0}
                       </div>
                     </div>

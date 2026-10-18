@@ -115,97 +115,93 @@ export default function AnalysisRunsPage() {
         </div>
       }
     >
-      <div className="space-y-6">
+      <div className="space-y-5">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Configured Execution History</CardTitle>
-            <CardDescription>
-              Each run produces reproducible detections tracked against specific rule and model
-              hashes.
+          <CardHeader className="pb-2.5">
+            <CardTitle className="text-sm font-semibold">Configured Execution History</CardTitle>
+            <CardDescription className="text-xs">
+              Reproducible detections tracked against specific rule and model hashes.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto rounded-md border">
+          <CardContent className="pt-1">
+            <div className="overflow-x-auto rounded border border-border">
               <table className="w-full text-left text-xs">
-                <thead className="bg-muted/50 text-muted-foreground border-b font-medium">
+                <thead className="bg-muted/30 text-muted-foreground border-b border-border font-mono text-[11px]">
                   <tr>
-                    <th className="p-3">Run ID</th>
-                    <th className="p-3">PCAP Target</th>
-                    <th className="p-3">Profile / Mode</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">Engines</th>
-                    <th className="p-3">Started / Finished</th>
-                    <th className="p-3">Actions</th>
+                    <th className="py-2.5 px-3 font-medium">Run ID</th>
+                    <th className="py-2.5 px-3 font-medium">PCAP Target</th>
+                    <th className="py-2.5 px-3 font-medium">Mode</th>
+                    <th className="py-2.5 px-3 font-medium">Status</th>
+                    <th className="py-2.5 px-3 font-medium">Engines / Hash</th>
+                    <th className="py-2.5 px-3 font-medium">Execution Window</th>
+                    <th className="py-2.5 px-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-border divide-y">
                   {apiRuns && apiRuns.length > 0
                     ? apiRuns.map((run: RunSummaryResponse) => (
-                        <tr key={run.run_id} className="hover:bg-muted/30 transition-colors">
-                          <td className="text-foreground p-3 font-mono font-medium">
+                        <tr key={run.run_id} className="hover:bg-muted/20 transition-colors">
+                          <td className="text-foreground py-2.5 px-3 font-mono font-medium">
                             <Link
                               href={`/runs/${run.run_id}`}
-                              className="text-blue-600 hover:underline dark:text-blue-400"
+                              className="text-foreground hover:underline font-mono"
                             >
                               {run.run_id}
                             </Link>
                           </td>
-                          <td className="p-3">
-                            <div className="text-foreground font-mono text-[11px] font-medium">
+                          <td className="py-2.5 px-3">
+                            <div className="text-foreground font-mono text-[11px]">
                               {run.input_path}
                             </div>
                             {run.scenario_id && (
-                              <div className="text-muted-foreground text-[10px]">
+                              <div className="text-muted-foreground text-[10px] font-mono">
                                 Scenario: {run.scenario_id}
                               </div>
                             )}
                           </td>
-                          <td className="p-3">
-                            <div className="flex flex-col gap-1">
-                              <span className="bg-muted w-fit rounded px-2 py-0.5 font-mono text-[10px]">
-                                {run.run_profile}
-                              </span>
-                              <span className="w-fit rounded bg-blue-500/10 px-1.5 py-0.5 font-mono text-[10px] text-blue-700 uppercase dark:text-blue-400">
+                          <td className="py-2.5 px-3">
+                            <div className="flex items-center gap-1.5 font-mono text-[10px]">
+                              <span className="rounded border border-border bg-muted/40 px-1.5 py-0.2 text-muted-foreground uppercase">
                                 {run.detector_mode}
                               </span>
                             </div>
                           </td>
-                          <td className="p-3">
+                          <td className="py-2.5 px-3">
                             <RunStatusBadge status={run.status} />
                           </td>
-                          <td className="text-muted-foreground p-3 font-mono text-[11px]">
+                          <td className="text-muted-foreground py-2.5 px-3 font-mono text-[11px]">
                             <div>{run.snort_version || "Snort: local"}</div>
-                            <div className="max-w-[120px] truncate text-[10px]">
-                              Hash: {run.input_hash.slice(0, 10)}...
+                            <div className="max-w-[120px] truncate text-[10px] text-muted-foreground/80">
+                              {run.input_hash.slice(0, 10)}...
                             </div>
                           </td>
-                          <td className="text-muted-foreground p-3 font-mono text-[11px]">
+                          <td className="text-muted-foreground py-2.5 px-3 font-mono text-[11px]">
                             <div>
                               {run.started_at ? new Date(run.started_at).toLocaleTimeString() : "—"}
                             </div>
-                            <div className="text-[10px]">
+                            <div className="text-[10px] text-muted-foreground/80">
                               {run.finished_at
                                 ? new Date(run.finished_at).toLocaleTimeString()
                                 : "Pending"}
                             </div>
                           </td>
-                          <td className="p-3">
-                            <div className="flex items-center gap-1.5">
+                          <td className="py-2.5 px-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
                               {run.status === "queued" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="h-7 gap-1 text-[11px]"
+                                  className="h-6 gap-1 text-[11px] px-2"
                                   disabled={executeMutation.isPending}
                                   onClick={() => executeMutation.mutate(run.run_id)}
                                 >
-                                  <Play className="size-3 text-emerald-600" />
+                                  <Play className="size-3 text-foreground/80" />
                                   Execute
                                 </Button>
                               )}
                               <Link
                                 href={`/runs/${run.run_id}`}
-                                className="text-muted-foreground hover:text-foreground ml-1 text-xs font-medium underline-offset-2 hover:underline"
+                                className="text-muted-foreground hover:text-foreground text-xs font-medium hover:underline"
                               >
                                 Details
                               </Link>
@@ -214,11 +210,11 @@ export default function AnalysisRunsPage() {
                         </tr>
                       ))
                     : SAMPLE_RUNS.map((run) => (
-                        <tr key={run.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="text-foreground p-3 font-mono font-medium">
+                        <tr key={run.id} className="hover:bg-muted/20 transition-colors">
+                          <td className="text-foreground py-2.5 px-3 font-mono font-medium">
                             <Link
                               href={`/runs/${run.id}`}
-                              className="text-blue-600 hover:underline dark:text-blue-400"
+                              className="text-foreground hover:underline font-mono"
                             >
                               {run.id}
                             </Link>

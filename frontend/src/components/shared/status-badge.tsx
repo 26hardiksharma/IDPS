@@ -6,17 +6,17 @@ import { cn } from "@/lib/utils";
 
 export function RunStatusBadge({ status }: { status: RunStatus }) {
   const styles: Record<RunStatus, string> = {
-    queued: "bg-slate-500/15 text-slate-700 dark:text-slate-400 border-slate-500/30",
-    running: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30 animate-pulse",
-    completed: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
-    failed: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30",
-    cancelled: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+    queued: "bg-muted text-muted-foreground border-border",
+    running: "bg-primary/10 text-primary border-primary/25",
+    completed: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25",
+    failed: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/25",
+    cancelled: "bg-muted text-muted-foreground border-border",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium capitalize",
+        "inline-flex items-center rounded border px-2 py-0.5 text-[11px] font-mono capitalize",
         styles[status]
       )}
     >
@@ -27,17 +27,17 @@ export function RunStatusBadge({ status }: { status: RunStatus }) {
 
 export function IncidentStatusBadge({ status }: { status: IncidentStatus }) {
   const styles: Record<IncidentStatus, string> = {
-    new: "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30 font-semibold",
-    triaged: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30",
-    in_review: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
-    resolved: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
-    dismissed: "bg-slate-500/15 text-slate-700 dark:text-slate-400 border-slate-500/30",
+    new: "bg-primary/10 text-primary border-primary/20",
+    triaged: "bg-muted text-muted-foreground border-border",
+    in_review: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+    resolved: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
+    dismissed: "bg-muted text-muted-foreground border-border",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium capitalize",
+        "inline-flex items-center rounded border px-2 py-0.5 text-[11px] font-medium capitalize",
         styles[status]
       )}
     >

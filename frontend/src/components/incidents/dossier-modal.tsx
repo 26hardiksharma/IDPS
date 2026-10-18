@@ -69,18 +69,18 @@ export function DossierModal({ incidentId }: DossierModalProps) {
         variant="outline"
         size="sm"
         onClick={handleOpen}
-        className="gap-1.5 text-xs border-primary/30 text-primary hover:bg-primary/10"
+        className="gap-1.5 text-xs font-mono"
       >
-        <FileText className="size-3.5" />
+        <FileText className="size-3.5 text-muted-foreground" />
         SOC Dossier Report
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-6">
-          <DialogHeader className="pb-3 border-b">
+          <DialogHeader className="pb-3 border-b border-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileCheck2 className="size-5 text-emerald-600 dark:text-emerald-400" />
+                <FileCheck2 className="size-5 text-muted-foreground" />
                 <div>
                   <DialogTitle className="text-base font-semibold">
                     Cryptographic Forensic Investigation Dossier

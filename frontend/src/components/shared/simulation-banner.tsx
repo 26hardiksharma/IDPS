@@ -12,12 +12,12 @@ export function SimulationBanner({ className, variant = "warning" }: SimulationB
     return (
       <div
         className={cn(
-          "inline-flex items-center gap-1.5 rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300",
+          "inline-flex items-center gap-2 rounded border border-amber-500/25 bg-amber-500/5 px-2.5 py-1 text-xs text-amber-800 dark:text-amber-300",
           className
         )}
       >
         <AlertTriangle className="size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
-        <span>{SIMULATION_SAFETY_DISCLAIMER}</span>
+        <span className="font-mono text-[11px] font-medium tracking-wide">{SIMULATION_SAFETY_DISCLAIMER}</span>
       </div>
     );
   }
@@ -26,16 +26,16 @@ export function SimulationBanner({ className, variant = "warning" }: SimulationB
     <div
       role="alert"
       className={cn(
-        "relative flex flex-col gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3.5 text-sm text-amber-800 dark:text-amber-200 md:flex-row md:items-center md:gap-3",
+        "flex flex-col gap-1 rounded border border-amber-500/25 bg-amber-500/5 px-3 py-2 text-xs text-amber-800 dark:text-amber-300 md:flex-row md:items-center md:gap-2.5",
         className
       )}
     >
-      <div className="flex shrink-0 items-center gap-2 font-bold tracking-tight">
-        <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
-        <span className="text-xs uppercase tracking-wider">{SIMULATION_SAFETY_DISCLAIMER}</span>
+      <div className="flex shrink-0 items-center gap-1.5 font-mono text-[11px] font-medium tracking-wide">
+        <AlertTriangle className="size-3.5 text-amber-600 dark:text-amber-400" />
+        <span>{SIMULATION_SAFETY_DISCLAIMER}</span>
       </div>
-      <span className="hidden text-amber-500/40 md:inline">|</span>
-      <p className="text-xs text-amber-700 dark:text-amber-300/90 leading-relaxed">
+      <span className="hidden text-muted-foreground/40 md:inline">—</span>
+      <p className="text-[11px] text-muted-foreground leading-normal">
         {SIMULATION_SAFETY_DESCRIPTION}
       </p>
     </div>

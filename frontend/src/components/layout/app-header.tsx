@@ -19,8 +19,8 @@ export function AppHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-card/95 px-4 md:px-6 backdrop-blur supports-[backdrop-filter]:bg-card/75">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-30 flex h-12 items-center justify-between border-b border-border bg-card px-4 md:px-6">
+      <div className="flex items-center gap-2.5">
         {/* Mobile menu sheet trigger */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger
@@ -28,10 +28,10 @@ export function AppHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden size-8"
+                className="md:hidden size-7"
                 aria-label="Open Navigation Menu"
               >
-                <Menu className="size-4" />
+                <Menu className="size-4 text-muted-foreground" />
               </Button>
             }
           />
@@ -41,16 +41,15 @@ export function AppHeader() {
         </Sheet>
 
         {/* Current Area Indicator */}
-        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <span className="text-muted-foreground hidden sm:inline">XAI-IDPS</span>
-          <span className="text-muted-foreground hidden sm:inline">/</span>
-          <span>{currentNav?.title || "Dashboard"}</span>
+        <div className="flex items-center gap-1.5 text-xs text-foreground">
+          <span className="text-muted-foreground hidden sm:inline font-mono">XAI-IDPS</span>
+          <span className="text-muted-foreground/40 hidden sm:inline font-mono">/</span>
+          <span className="font-medium text-foreground">{currentNav?.title || "Dashboard"}</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <ConnectionStatus />
-
         <ThemeToggle />
       </div>
     </header>

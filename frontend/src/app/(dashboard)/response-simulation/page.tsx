@@ -178,48 +178,48 @@ export default function ResponseSimulationPage() {
 
         {/* Audit Trail History */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <History className="size-4 text-muted-foreground" />
               <span>Simulated Response Audit Trail</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs">
               Persistent log of simulated actions, actors, and safety audit assertions.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border overflow-x-auto">
+            <div className="rounded-md border border-border overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-muted/50 border-b font-medium text-muted-foreground">
+                <thead className="bg-muted/40 border-b border-border font-medium text-muted-foreground font-mono">
                   <tr>
-                    <th className="p-3">Audit ID</th>
-                    <th className="p-3">Incident ID</th>
-                    <th className="p-3">Proposed Action</th>
-                    <th className="p-3">Target Scope</th>
-                    <th className="p-3">Safety Mode</th>
-                    <th className="p-3">Policy Decision</th>
-                    <th className="p-3">Timestamp</th>
+                    <th className="py-2.5 px-3 font-medium">Audit ID</th>
+                    <th className="py-2.5 px-3 font-medium">Incident ID</th>
+                    <th className="py-2.5 px-3 font-medium">Proposed Action</th>
+                    <th className="py-2.5 px-3 font-medium">Target Scope</th>
+                    <th className="py-2.5 px-3 font-medium">Safety Mode</th>
+                    <th className="py-2.5 px-3 font-medium">Policy Decision</th>
+                    <th className="py-2.5 px-3 font-medium">Timestamp</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {apiSimulations && apiSimulations.length > 0 ? (
                     apiSimulations.map((sim) => (
                       <tr key={sim.simulation_id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-mono font-medium">{sim.simulation_id}</td>
-                        <td className="p-3 font-mono text-[11px] text-blue-600 dark:text-blue-400">
+                        <td className="py-2.5 px-3 font-mono font-medium text-foreground">{sim.simulation_id}</td>
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-foreground hover:underline">
                           {sim.incident_id}
                         </td>
-                        <td className="p-3 font-semibold text-foreground">{sim.proposed_action}</td>
-                        <td className="p-3 font-mono text-[11px]">{sim.action_target || "—"}</td>
-                        <td className="p-3">
-                          <span className="rounded bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-[11px] font-bold border border-amber-500/30 uppercase">
+                        <td className="py-2.5 px-3 font-medium text-foreground">{sim.proposed_action}</td>
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">{sim.action_target || "—"}</td>
+                        <td className="py-2.5 px-3">
+                          <span className="inline-flex items-center rounded border border-amber-500/25 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[10px] text-amber-800 dark:text-amber-300 font-medium uppercase tracking-wide">
                             Simulation Only
                           </span>
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           {sim.policy_decision || "simulated_accepted"}
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           {sim.created_at ? new Date(sim.created_at).toLocaleTimeString() : "—"}
                         </td>
                       </tr>
@@ -227,21 +227,21 @@ export default function ResponseSimulationPage() {
                   ) : (
                     SAMPLE_SIMULATIONS.map((sim) => (
                       <tr key={sim.id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-mono font-medium">{sim.id}</td>
-                        <td className="p-3 font-mono text-[11px] text-blue-600 dark:text-blue-400">
+                        <td className="py-2.5 px-3 font-mono font-medium text-foreground">{sim.id}</td>
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-foreground hover:underline">
                           {sim.incident_id}
                         </td>
-                        <td className="p-3 font-semibold text-foreground">{sim.action}</td>
-                        <td className="p-3 font-mono text-[11px]">{sim.target_scope}</td>
-                        <td className="p-3">
-                          <span className="rounded bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-[11px] font-bold border border-amber-500/30 uppercase">
+                        <td className="py-2.5 px-3 font-medium text-foreground">{sim.action}</td>
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">{sim.target_scope}</td>
+                        <td className="py-2.5 px-3">
+                          <span className="inline-flex items-center rounded border border-amber-500/25 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[10px] text-amber-800 dark:text-amber-300 font-medium uppercase tracking-wide">
                             Simulation Only
                           </span>
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           simulated_accepted
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           {new Date(sim.timestamp).toLocaleTimeString()}
                         </td>
                       </tr>
@@ -258,25 +258,25 @@ export default function ResponseSimulationPage() {
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <ShieldCheck className="size-5 text-amber-600" />
+            <DialogTitle className="flex items-center gap-2 text-base font-semibold">
+              <ShieldCheck className="size-4 text-muted-foreground" />
               Confirm Response Simulation
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs">
               This action will evaluate the proposed response against simulation policies and write an immutable audit record.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200 space-y-1">
-            <div className="font-semibold">Safety Boundary Affirmation:</div>
+          <div className="rounded-md border border-amber-500/25 bg-amber-500/5 p-3 text-xs text-foreground/90 font-mono space-y-1">
+            <div className="font-semibold text-amber-800 dark:text-amber-300">Safety Boundary Affirmation:</div>
             <p>
               No active host or network changes will be made. Iptables, packet routing, and network interfaces remain untouched.
             </p>
           </div>
 
-          <div className="text-xs space-y-1 py-1 font-mono">
-            <div>Action: {selectedAction}</div>
-            <div>Target: {targetScope}</div>
+          <div className="text-xs space-y-1 py-1 font-mono text-muted-foreground">
+            <div>Action: <span className="text-foreground">{selectedAction}</span></div>
+            <div>Target: <span className="text-foreground">{targetScope}</span></div>
           </div>
 
           <DialogFooter className="pt-2">

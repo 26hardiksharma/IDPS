@@ -15,11 +15,11 @@ export function ConnectionStatus() {
   if (isPending) {
     return (
       <div
-        className="flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground"
+        className="flex items-center gap-1.5 rounded border border-border bg-card/80 px-2 py-0.5 text-xs text-muted-foreground"
         title="Checking backend API connectivity"
       >
-        <RefreshCw className="size-3 animate-spin text-amber-500" />
-        <span className="font-mono text-[11px] hidden sm:inline">Checking</span>
+        <span className="size-1.5 rounded-full bg-amber-500" />
+        <span className="font-mono text-[11px] text-muted-foreground hidden sm:inline">Backend: Checking</span>
       </div>
     );
   }
@@ -27,22 +27,22 @@ export function ConnectionStatus() {
   if (isError || data?.status !== "ok") {
     return (
       <div
-        className="flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/10 px-2.5 py-1 text-xs text-destructive"
+        className="flex items-center gap-1.5 rounded border border-border bg-card/80 px-2 py-0.5 text-xs text-muted-foreground"
         title="FastAPI backend offline (expected when backend is not running)"
       >
-        <WifiOff className="size-3" />
-        <span className="font-mono text-[11px] font-semibold hidden sm:inline">API Offline</span>
+        <span className="size-1.5 rounded-full bg-red-500" />
+        <span className="font-mono text-[11px] text-muted-foreground hidden sm:inline">Backend: Offline</span>
       </div>
     );
   }
 
   return (
     <div
-      className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-700 dark:text-emerald-400"
+      className="flex items-center gap-1.5 rounded border border-border bg-card/80 px-2 py-0.5 text-xs text-muted-foreground"
       title="Connected to FastAPI backend (localhost:8000)"
     >
-      <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-      <span className="font-mono text-[11px] font-semibold hidden sm:inline">Connected</span>
+      <span className="size-1.5 rounded-full bg-emerald-500" />
+      <span className="font-mono text-[11px] text-foreground/80 hidden sm:inline">Backend: Live</span>
     </div>
   );
 }

@@ -121,59 +121,59 @@ export default function RunDetailPage({ params }: { params: Promise<{ runId: str
         </div>
       }
     >
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Run Metadata Grid */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-3">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1.5">
-                <Layers className="size-3.5 text-blue-500" />
+            <CardHeader className="pb-1.5">
+              <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Layers className="size-3.5 text-muted-foreground" />
                 Pipeline Status
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-1.5 pt-0.5">
               <div className="flex items-center gap-2">
                 <RunStatusBadge status={displayRun.status} />
-                <span className="font-mono text-xs uppercase rounded bg-muted px-2 py-0.5">
+                <span className="font-mono text-[11px] uppercase rounded border border-border bg-muted/40 px-1.5 py-0.2 text-muted-foreground">
                   {displayRun.detector_mode}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground font-mono">
+              <p className="text-[11px] text-muted-foreground font-mono">
                 Profile: {displayRun.run_profile}
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1.5">
-                <FileText className="size-3.5 text-amber-500" />
+            <CardHeader className="pb-1.5">
+              <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <FileText className="size-3.5 text-muted-foreground" />
                 Input Target
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-1">
+            <CardContent className="space-y-1 pt-0.5">
               <div className="font-mono text-xs font-medium text-foreground truncate">
                 {displayRun.input_path}
               </div>
-              <div className="text-[11px] text-muted-foreground">
+              <div className="text-[11px] text-muted-foreground font-mono">
                 Scenario: {displayRun.scenario_id || "Unspecified"}
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1.5">
-                <Hash className="size-3.5 text-emerald-500" />
+            <CardHeader className="pb-1.5">
+              <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Hash className="size-3.5 text-muted-foreground" />
                 Cryptographic Provenance
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-1">
+            <CardContent className="space-y-1 pt-0.5">
               <div className="font-mono text-[11px] text-muted-foreground truncate" title={displayRun.input_hash}>
                 SHA-256: {displayRun.input_hash}
               </div>
-              <div className="text-[11px] text-muted-foreground">
-                Snort Engine: {displayRun.snort_version || "Snort 3.1.75"}
+              <div className="text-[11px] text-muted-foreground font-mono">
+                Engine: {displayRun.snort_version || "Snort 3.1.75"}
               </div>
             </CardContent>
           </Card>
@@ -181,40 +181,40 @@ export default function RunDetailPage({ params }: { params: Promise<{ runId: str
 
         {/* Execution Timeline Card */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Execution Timeline</CardTitle>
-            <CardDescription>
-              Reproducible timestamps for pipeline start, completion, and duration.
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold">Execution Timeline</CardTitle>
+            <CardDescription className="text-xs">
+              Deterministic timestamps for pipeline start, completion, and duration.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-3 text-xs">
-              <div className="rounded-md border p-3">
-                <div className="text-muted-foreground">Created At</div>
-                <div className="font-mono font-medium text-foreground mt-1" suppressHydrationWarning>
+          <CardContent className="pt-1">
+            <div className="grid gap-3 sm:grid-cols-3 text-xs">
+              <div className="rounded border border-border bg-card p-2.5">
+                <div className="text-[11px] text-muted-foreground">Created At</div>
+                <div className="font-mono font-medium text-foreground text-xs mt-0.5" suppressHydrationWarning>
                   {new Date(displayRun.created_at).toLocaleString()}
                 </div>
               </div>
 
-              <div className="rounded-md border p-3">
-                <div className="text-muted-foreground">Started At</div>
-                <div className="font-mono font-medium text-foreground mt-1" suppressHydrationWarning>
+              <div className="rounded border border-border bg-card p-2.5">
+                <div className="text-[11px] text-muted-foreground">Started At</div>
+                <div className="font-mono font-medium text-foreground text-xs mt-0.5" suppressHydrationWarning>
                   {displayRun.started_at ? new Date(displayRun.started_at).toLocaleString() : "Not started"}
                 </div>
               </div>
 
-              <div className="rounded-md border p-3">
-                <div className="text-muted-foreground">Finished At</div>
-                <div className="font-mono font-medium text-foreground mt-1" suppressHydrationWarning>
+              <div className="rounded border border-border bg-card p-2.5">
+                <div className="text-[11px] text-muted-foreground">Finished At</div>
+                <div className="font-mono font-medium text-foreground text-xs mt-0.5" suppressHydrationWarning>
                   {displayRun.finished_at ? new Date(displayRun.finished_at).toLocaleString() : "In progress / Pending"}
                 </div>
               </div>
             </div>
 
             {displayRun.error_summary && (
-              <div className="mt-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
-                <div className="font-semibold">Pipeline Error Summary:</div>
-                <div className="font-mono mt-1">{displayRun.error_summary}</div>
+              <div className="mt-3 rounded border border-destructive/30 bg-destructive/5 p-2.5 text-xs text-destructive">
+                <div className="font-medium text-xs">Pipeline Error Summary:</div>
+                <div className="font-mono text-[11px] mt-0.5">{displayRun.error_summary}</div>
               </div>
             )}
           </CardContent>
@@ -222,44 +222,44 @@ export default function RunDetailPage({ params }: { params: Promise<{ runId: str
 
         {/* Evidence Records Card */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Captured Evidence Records</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold">Captured Evidence Records</CardTitle>
+            <CardDescription className="text-xs">
               Structured flow and packet evidence records linked to this run (authoritative ground truth).
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-1">
             {evidenceList && evidenceList.length > 0 ? (
-              <div className="rounded-md border overflow-x-auto">
+              <div className="rounded border border-border overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-muted/50 border-b font-medium text-muted-foreground">
+                  <thead className="bg-muted/30 border-b border-border font-mono text-[11px] text-muted-foreground">
                     <tr>
-                      <th className="p-3">Evidence ID</th>
-                      <th className="p-3">Source Type</th>
-                      <th className="p-3">Protocol</th>
-                      <th className="p-3">Source & Destination</th>
-                      <th className="p-3">Event Time</th>
-                      <th className="p-3">Content Hash</th>
+                      <th className="py-2.5 px-3 font-medium">Evidence ID</th>
+                      <th className="py-2.5 px-3 font-medium">Source Type</th>
+                      <th className="py-2.5 px-3 font-medium">Protocol</th>
+                      <th className="py-2.5 px-3 font-medium">Source & Destination</th>
+                      <th className="py-2.5 px-3 font-medium">Event Time</th>
+                      <th className="py-2.5 px-3 font-medium">Content Hash</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {evidenceList.map((ev) => (
-                      <tr key={ev.evidence_id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-mono font-medium">{ev.evidence_id}</td>
-                        <td className="p-3">
-                          <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono uppercase">
+                      <tr key={ev.evidence_id} className="hover:bg-muted/20 transition-colors">
+                        <td className="py-2.5 px-3 font-mono font-medium text-foreground">{ev.evidence_id}</td>
+                        <td className="py-2.5 px-3">
+                          <span className="rounded border border-border bg-muted/40 px-1.5 py-0.2 text-[10px] font-mono uppercase text-muted-foreground">
                             {ev.source_type}
                           </span>
                         </td>
-                        <td className="p-3 font-mono">{ev.protocol || "IP"}</td>
-                        <td className="p-3 font-mono text-[11px]">
+                        <td className="py-2.5 px-3 font-mono text-[11px]">{ev.protocol || "IP"}</td>
+                        <td className="py-2.5 px-3 font-mono text-[11px]">
                           <div>{ev.src_ip || "—"}:{ev.src_port || ""}</div>
-                          <div className="text-muted-foreground">→ {ev.dst_ip || "—"}:{ev.dst_port || ""}</div>
+                          <div className="text-muted-foreground/80">→ {ev.dst_ip || "—"}:{ev.dst_port || ""}</div>
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           {ev.event_time || new Date(ev.created_at).toLocaleTimeString()}
                         </td>
-                        <td className="p-3 font-mono text-[10px] text-muted-foreground max-w-[120px] truncate" title={ev.content_hash || ""}>
+                        <td className="py-2.5 px-3 font-mono text-[10px] text-muted-foreground max-w-[120px] truncate" title={ev.content_hash || ""}>
                           {ev.content_hash || "—"}
                         </td>
                       </tr>
@@ -268,7 +268,7 @@ export default function RunDetailPage({ params }: { params: Promise<{ runId: str
                 </table>
               </div>
             ) : (
-              <div className="rounded-md border border-dashed p-8 text-center text-xs text-muted-foreground">
+              <div className="rounded border border-dashed border-border p-8 text-center text-xs text-muted-foreground bg-muted/10">
                 {evidencePending
                   ? "Loading captured evidence records..."
                   : "No evidence records captured for this run yet, or execution is pending."}

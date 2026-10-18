@@ -111,8 +111,8 @@ export default function RuleRegistryPage() {
     >
       <div className="space-y-6">
         {/* Policy Boundary Notice */}
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200 flex items-center gap-2">
-          <Info className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+        <div className="rounded-md border border-amber-500/25 bg-amber-500/5 px-3.5 py-2.5 text-xs text-foreground/90 font-mono flex items-center gap-2">
+          <Info className="size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
           <span>
             Candidate rules require offline verification against labelled corpus.
             Candidate rules are never automatically deployed into active detection.
@@ -121,53 +121,53 @@ export default function RuleRegistryPage() {
 
         {/* Existing Rules Table */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Registered Rules & Baseline Models</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold">Registered Rules & Baseline Models</CardTitle>
+            <CardDescription className="text-xs">
               Version-tracked signatures and models used for reproducible detection provenance.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border overflow-x-auto">
+            <div className="rounded-md border border-border overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-muted/50 border-b font-medium text-muted-foreground">
+                <thead className="bg-muted/40 border-b border-border font-medium text-muted-foreground font-mono">
                   <tr>
-                    <th className="p-3">Rule ID / SID</th>
-                    <th className="p-3">Version</th>
-                    <th className="p-3">Source</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">SHA-256 Hash</th>
-                    <th className="p-3">Registered Time</th>
+                    <th className="py-2.5 px-3 font-medium">Rule ID / SID</th>
+                    <th className="py-2.5 px-3 font-medium">Version</th>
+                    <th className="py-2.5 px-3 font-medium">Source</th>
+                    <th className="py-2.5 px-3 font-medium">Status</th>
+                    <th className="py-2.5 px-3 font-medium">SHA-256 Hash</th>
+                    <th className="py-2.5 px-3 font-medium">Registered</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {apiRules && apiRules.length > 0 ? (
                     apiRules.map((rule: RuleVersionResponse) => (
                       <tr key={rule.rule_version_id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-mono font-medium text-foreground">
+                        <td className="py-2.5 px-3 font-mono font-medium text-foreground">
                           {rule.rule_id}
                         </td>
-                        <td className="p-3 font-mono text-muted-foreground">{rule.version}</td>
-                        <td className="p-3">
-                          <span className="rounded bg-muted px-2 py-0.5 text-[11px] capitalize font-mono">
+                        <td className="py-2.5 px-3 font-mono text-muted-foreground">{rule.version}</td>
+                        <td className="py-2.5 px-3">
+                          <span className="rounded border border-border bg-muted/60 px-1.5 py-0.5 text-[11px] capitalize font-mono text-muted-foreground">
                             {rule.source}
                           </span>
                         </td>
-                        <td className="p-3">
+                        <td className="py-2.5 px-3">
                           {rule.status === "active" ? (
-                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+                            <span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-700 dark:text-emerald-400">
                               <CheckCircle className="size-3" /> Active
                             </span>
                           ) : (
-                            <span className="rounded bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-[11px] font-medium border border-amber-500/30">
-                              Candidate Review
+                            <span className="inline-flex items-center rounded border border-amber-500/25 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[11px] text-amber-800 dark:text-amber-300">
+                              Candidate
                             </span>
                           )}
                         </td>
-                        <td className="p-3 font-mono text-[10px] text-muted-foreground max-w-[120px] truncate" title={rule.sha256}>
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground max-w-[120px] truncate" title={rule.sha256}>
                           {rule.sha256}
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           {new Date(rule.created_at).toLocaleDateString()}
                         </td>
                       </tr>
@@ -175,28 +175,28 @@ export default function RuleRegistryPage() {
                   ) : (
                     SAMPLE_RULES.map((rule) => (
                       <tr key={rule.id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-mono font-medium">{rule.rule_identifier}</td>
-                        <td className="p-3 font-mono text-muted-foreground">{rule.version}</td>
-                        <td className="p-3">
-                          <span className="rounded bg-muted px-2 py-0.5 text-[11px] capitalize font-mono">
+                        <td className="py-2.5 px-3 font-mono font-medium text-foreground">{rule.rule_identifier}</td>
+                        <td className="py-2.5 px-3 font-mono text-muted-foreground">{rule.version}</td>
+                        <td className="py-2.5 px-3">
+                          <span className="rounded border border-border bg-muted/60 px-1.5 py-0.5 text-[11px] capitalize font-mono text-muted-foreground">
                             {rule.source.replace("_", " ")}
                           </span>
                         </td>
-                        <td className="p-3">
+                        <td className="py-2.5 px-3">
                           {rule.is_active ? (
-                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+                            <span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-700 dark:text-emerald-400">
                               <CheckCircle className="size-3" /> Active
                             </span>
                           ) : (
-                            <span className="rounded bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-[11px] font-medium border border-amber-500/30">
-                              Candidate Review
+                            <span className="inline-flex items-center rounded border border-amber-500/25 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[11px] text-amber-800 dark:text-amber-300">
+                              Candidate
                             </span>
                           )}
                         </td>
-                        <td className="p-3 font-mono text-[10px] text-muted-foreground max-w-[120px] truncate">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground max-w-[120px] truncate">
                           {rule.rule_hash}
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           {new Date(rule.created_at).toLocaleDateString()}
                         </td>
                       </tr>

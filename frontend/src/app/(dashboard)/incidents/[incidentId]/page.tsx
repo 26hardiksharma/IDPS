@@ -191,7 +191,7 @@ export default function IncidentDetailPage({
         <div className="grid gap-4 sm:grid-cols-4">
           <Card>
             <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase">
+              <CardTitle className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider">
                 Severity
               </CardTitle>
             </CardHeader>
@@ -202,26 +202,26 @@ export default function IncidentDetailPage({
 
           <Card>
             <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase">
+              <CardTitle className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider">
                 Deterministic Risk Score
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
+              <div className="text-2xl font-semibold font-mono text-foreground">
                 {Math.round(displayIncident.risk_score * 100)}
-                <span className="text-xs text-muted-foreground">/100</span>
+                <span className="text-xs font-normal text-muted-foreground">/100</span>
               </div>
-              <p className="text-[11px] text-muted-foreground">Authoritative decision</p>
+              <p className="text-[11px] text-muted-foreground font-mono mt-0.5">Authoritative score</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase">
+              <CardTitle className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider">
                 Review Status
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-1">
+            <CardContent className="space-y-1.5">
               <IncidentStatusBadge status={displayIncident.status as OldIncidentStatus} />
               <div className="flex gap-1 pt-1">
                 {(["open", "under_review", "acknowledged", "closed"] as IncidentStatus[]).map((st) => (
@@ -229,10 +229,10 @@ export default function IncidentDetailPage({
                     key={st}
                     onClick={() => handleStatusChange(st)}
                     disabled={statusMutation.isPending}
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-mono border ${
+                    className={`rounded px-1.5 py-0.5 text-[10px] font-mono border transition-colors ${
                       displayIncident.status === st
-                        ? "bg-foreground text-background font-bold"
-                        : "bg-muted text-muted-foreground hover:text-foreground"
+                        ? "bg-accent border-border text-foreground font-medium"
+                        : "bg-muted/40 border-border text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {st.slice(0, 4)}
@@ -244,18 +244,18 @@ export default function IncidentDetailPage({
 
           <Card>
             <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase">
+              <CardTitle className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider">
                 Correlated Run
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Link
                 href={`/runs/${displayIncident.run_id}`}
-                className="font-mono text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline block truncate"
+                className="font-mono text-xs font-medium text-foreground hover:underline block truncate"
               >
                 {displayIncident.run_id}
               </Link>
-              <p className="text-[11px] text-muted-foreground mt-1">
+              <p className="text-[11px] text-muted-foreground font-mono mt-1">
                 Policy: {displayIncident.policy_version_id}
               </p>
             </CardContent>
@@ -282,12 +282,12 @@ export default function IncidentDetailPage({
         <AiAnalystChat incidentId={incidentId} />
 
         {/* Navigation Tabs for Details */}
-        <div className="flex items-center gap-2 border-b pb-2 text-xs font-medium">
+        <div className="flex items-center gap-1.5 border-b border-border pb-2 text-xs font-medium">
           <button
             onClick={() => setActiveTab("detections")}
-            className={`rounded-md px-3 py-1.5 transition-colors ${
+            className={`rounded-md px-3 py-1.5 transition-colors font-mono ${
               activeTab === "detections"
-                ? "bg-muted text-foreground font-semibold"
+                ? "bg-accent text-foreground font-semibold"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -295,20 +295,20 @@ export default function IncidentDetailPage({
           </button>
           <button
             onClick={() => setActiveTab("mitre")}
-            className={`rounded-md px-3 py-1.5 transition-colors flex items-center gap-1.5 ${
+            className={`rounded-md px-3 py-1.5 transition-colors flex items-center gap-1.5 font-mono ${
               activeTab === "mitre"
-                ? "bg-muted text-foreground font-semibold"
+                ? "bg-accent text-foreground font-semibold"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Crosshair className="size-3 text-rose-500" />
-            MITRE ATT&CK® ({displayIncident.mitre_attack?.length || 0})
+            <Crosshair className="size-3 text-muted-foreground" />
+            MITRE ATT&CK ({displayIncident.mitre_attack?.length || 0})
           </button>
           <button
             onClick={() => setActiveTab("factors")}
-            className={`rounded-md px-3 py-1.5 transition-colors ${
+            className={`rounded-md px-3 py-1.5 transition-colors font-mono ${
               activeTab === "factors"
-                ? "bg-muted text-foreground font-semibold"
+                ? "bg-accent text-foreground font-semibold"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -316,9 +316,9 @@ export default function IncidentDetailPage({
           </button>
           <button
             onClick={() => setActiveTab("simulation")}
-            className={`rounded-md px-3 py-1.5 transition-colors ${
+            className={`rounded-md px-3 py-1.5 transition-colors font-mono ${
               activeTab === "simulation"
-                ? "bg-muted text-foreground font-semibold"
+                ? "bg-accent text-foreground font-semibold"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -329,55 +329,55 @@ export default function IncidentDetailPage({
         {/* Tab 1: Constituent Detections Table */}
         {activeTab === "detections" && (
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-semibold">
                 Detections Grouped into Incident
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs">
                 Raw findings from Snort 3 signature matches and statistical/ML anomaly engine.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border overflow-x-auto">
+              <div className="rounded-md border border-border overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-muted/50 border-b font-medium text-muted-foreground">
+                  <thead className="bg-muted/40 border-b border-border font-medium text-muted-foreground">
                     <tr>
-                      <th className="p-3">Detection ID</th>
-                      <th className="p-3">Detector Engine</th>
-                      <th className="p-3">Detector Name</th>
-                      <th className="p-3">Severity / Score</th>
-                      <th className="p-3">Endpoints</th>
-                      <th className="p-3">Rule / Model Hash</th>
+                      <th className="py-2.5 px-3 font-mono font-medium">Detection ID</th>
+                      <th className="py-2.5 px-3 font-mono font-medium">Engine</th>
+                      <th className="py-2.5 px-3 font-medium">Detector Name</th>
+                      <th className="py-2.5 px-3 font-medium">Severity / Score</th>
+                      <th className="py-2.5 px-3 font-mono font-medium">Endpoints</th>
+                      <th className="py-2.5 px-3 font-mono font-medium">Rule / Model Hash</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {displayIncident.detections.map((det) => (
                       <tr key={det.detection_id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-mono font-medium">{det.detection_id}</td>
-                        <td className="p-3">
+                        <td className="py-2.5 px-3 font-mono font-medium text-foreground">{det.detection_id}</td>
+                        <td className="py-2.5 px-3">
                           <span
-                            className={`rounded px-1.5 py-0.5 text-[10px] font-mono uppercase ${
+                            className={`rounded px-1.5 py-0.5 text-[10px] font-mono uppercase border ${
                               det.detector_type === "signature"
-                                ? "bg-blue-500/15 text-blue-700 dark:text-blue-400"
-                                : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                                ? "bg-primary/10 text-primary border-primary/20"
+                                : "bg-muted text-muted-foreground border-border"
                             }`}
                           >
                             {det.detector_type}
                           </span>
                         </td>
-                        <td className="p-3 font-medium text-foreground">{det.detector_name}</td>
-                        <td className="p-3">
+                        <td className="py-2.5 px-3 font-medium text-foreground">{det.detector_name}</td>
+                        <td className="py-2.5 px-3">
                           {det.severity && <SeverityBadge severity={det.severity as SeverityLevel} />}
                           {det.score !== null && det.score !== undefined && (
-                            <span className="font-mono text-xs ml-1">
+                            <span className="font-mono text-xs ml-1 text-muted-foreground">
                               Score: {det.score.toFixed(2)}
                             </span>
                           )}
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           {det.src_ip || "—"} → {det.dst_ip || "—"}
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
+                        <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
                           {det.rule_version_id || det.model_version_id || "default"}
                         </td>
                       </tr>

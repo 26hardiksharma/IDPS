@@ -23,74 +23,69 @@ export function ProvenanceChain({
       id: runId,
       href: `/runs/${runId}`,
       icon: PlaySquare,
-      color: "text-blue-500",
     },
     {
-      label: "Correlation Policy",
+      label: "Policy Version",
       id: policyVersionId,
       href: null,
       icon: Shield,
-      color: "text-amber-500",
     },
     {
       label: "Correlated Incident",
       id: incidentId,
       href: `/incidents/${incidentId}`,
       icon: AlertCircle,
-      color: "text-rose-500",
     },
     {
       label: "AI Explanation",
       id: explanationId || "None",
       href: null,
       icon: Sparkles,
-      color: "text-purple-500",
     },
     {
       label: "Response Simulation",
       id: hasSimulations ? "Audited" : "None",
       href: "/response-simulation",
       icon: TerminalSquare,
-      color: "text-emerald-500",
     },
   ];
 
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <GitCommit className="size-4 text-muted-foreground" />
+      <CardHeader className="pb-2.5">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <GitCommit className="size-3.5 text-muted-foreground" />
           End-to-End Provenance Lineage
         </CardTitle>
-        <CardDescription>
-          Explicit forensic provenance linking raw execution, policy rules, incident decision, and downstream actions.
+        <CardDescription className="text-xs">
+          Forensic chain linking raw PCAP execution, policy rules, incident decision, and downstream simulation.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 overflow-x-auto py-2">
+      <CardContent className="pt-1">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 overflow-x-auto py-1">
           {steps.map((step, idx) => {
             const Icon = step.icon;
             return (
               <div key={idx} className="flex items-center gap-2">
-                <div className="rounded-lg border bg-card p-3 min-w-[150px] shadow-xs">
-                  <div className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground mb-1">
-                    <Icon className={`size-3.5 ${step.color}`} />
+                <div className="rounded border border-border bg-card p-2.5 min-w-[145px]">
+                  <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground mb-1">
+                    <Icon className="size-3 text-muted-foreground/80" />
                     <span>{step.label}</span>
                   </div>
                   {step.href ? (
                     <Link
                       href={step.href}
-                      className="font-mono text-xs font-semibold text-foreground hover:underline text-blue-600 dark:text-blue-400 truncate block"
+                      className="font-mono text-xs font-medium text-foreground hover:underline truncate block"
                     >
                       {step.id}
                     </Link>
                   ) : (
-                    <div className="font-mono text-xs text-foreground truncate">{step.id}</div>
+                    <div className="font-mono text-xs text-muted-foreground truncate">{step.id}</div>
                   )}
                 </div>
 
                 {idx < steps.length - 1 && (
-                  <ArrowRight className="size-4 text-muted-foreground hidden md:block shrink-0" />
+                  <ArrowRight className="size-3.5 text-muted-foreground/40 hidden md:block shrink-0" />
                 )}
               </div>
             );

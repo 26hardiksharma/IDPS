@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { askIncidentAi } from "@/lib/api/services/incidents";
-import { Bot, Send, Sparkles, User, Clock, ShieldCheck, CornerDownLeft } from "lucide-react";
+import { Bot, Send, User, Clock, ShieldCheck, CornerDownLeft, TerminalSquare } from "lucide-react";
 import { toast } from "sonner";
 
 interface Message {
@@ -13,6 +13,12 @@ interface Message {
   text: string;
   citations?: string[];
   latency_ms?: number;
+}
+
+let nextMessageId = 0;
+function createMessageId(prefix: string): string {
+  nextMessageId += 1;
+  return `${prefix}-${nextMessageId}`;
 }
 
 const PRESET_PROMPTS = [
@@ -38,7 +44,7 @@ export function AiAnalystChat({ incidentId }: { incidentId: string }) {
     if (!textToSend || loading) return;
 
     const userMsg: Message = {
-      id: `user-${Date.now()}`,
+      id: createMessageId("user"),
       sender: "user",
       text: textToSend,
     };
@@ -50,7 +56,7 @@ export function AiAnalystChat({ incidentId }: { incidentId: string }) {
     try {
       const res = await askIncidentAi(incidentId, textToSend);
       const aiMsg: Message = {
-        id: `ai-${Date.now()}`,
+        id: createMessageId("ai"),
         sender: "assistant",
         text: res.response,
         citations: res.citations,
@@ -60,7 +66,7 @@ export function AiAnalystChat({ incidentId }: { incidentId: string }) {
     } catch {
       toast.error("AI analyst query failed. Please verify Ollama is active.");
       const fallbackMsg: Message = {
-        id: `err-${Date.now()}`,
+        id: createMessageId("err"),
         sender: "assistant",
         text: "Could not query Ollama. Local evidence records show deterministic correlation for this incident. Review the constituent detections table above for raw telemetry.",
       };
@@ -72,42 +78,42 @@ export function AiAnalystChat({ incidentId }: { incidentId: string }) {
 
   return (
     <Card className="border-border">
-      <CardHeader className="pb-3 border-b bg-muted/20">
+      <CardHeader className="pb-2.5 border-b border-border bg-muted/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="rounded-md bg-purple-500/10 p-1.5 text-purple-600 dark:text-purple-400">
-              <Sparkles className="size-4" />
+            <div className="rounded border border-border bg-muted/40 p-1 text-muted-foreground">
+              <TerminalSquare className="size-3.5" />
             </div>
             <div>
               <CardTitle className="text-sm font-semibold">
-                Interactive SOC AI Assistant
+                Advisory Evidence Inquiry
               </CardTitle>
               <CardDescription className="text-xs">
-                Ask targeted investigative questions grounded strictly in packet evidence.
+                Query local Ollama model grounded strictly in stored incident telemetry.
               </CardDescription>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded bg-purple-500/10 px-2 py-0.5 text-[10px] font-mono font-medium text-purple-700 dark:text-purple-300">
-              <ShieldCheck className="size-3" />
-              Grounded Ollama (Llama 3.2)
+            <span className="inline-flex items-center gap-1 rounded border border-border bg-card px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
+              <ShieldCheck className="size-3 text-muted-foreground" />
+              Local Ollama
             </span>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 space-y-4">
+      <CardContent className="p-3.5 space-y-3">
         {/* Preset Prompt Suggestions */}
-        <div className="flex flex-wrap gap-1.5">
-          <span className="text-[11px] font-medium text-muted-foreground mr-1 self-center">
-            Suggested:
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-mono text-muted-foreground mr-1">
+            Presets:
           </span>
           {PRESET_PROMPTS.map((prompt) => (
             <button
               key={prompt}
               disabled={loading}
               onClick={() => handleSend(prompt)}
-              className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
+              className="rounded border border-border bg-card px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
             >
               {prompt}
             </button>
@@ -115,28 +121,22 @@ export function AiAnalystChat({ incidentId }: { incidentId: string }) {
         </div>
 
         {/* Message Thread */}
-        <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+        <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
           {messages.map((m) => (
             <div
               key={m.id}
-              className={`flex gap-3 text-xs ${
+              className={`flex gap-2.5 text-xs ${
                 m.sender === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              {m.sender === "assistant" && (
-                <div className="rounded-full bg-primary/10 text-primary p-1.5 size-7 shrink-0 flex items-center justify-center">
-                  <Bot className="size-4" />
-                </div>
-              )}
-
               <div
-                className={`rounded-lg px-3.5 py-2.5 max-w-[85%] space-y-1.5 ${
+                className={`rounded border px-3 py-2 max-w-[85%] space-y-1 ${
                   m.sender === "user"
-                    ? "bg-primary text-primary-foreground ml-auto"
-                    : "bg-muted/60 text-foreground border border-border"
+                    ? "border-primary/30 bg-primary/10 text-foreground ml-auto"
+                    : "border-border bg-muted/20 text-foreground"
                 }`}
               >
-                <div className="whitespace-pre-wrap leading-relaxed">{m.text}</div>
+                <div className="whitespace-pre-wrap leading-relaxed text-xs">{m.text}</div>
 
                 {m.citations && m.citations.length > 0 && (
                   <div className="pt-2 border-t border-border/40 flex flex-wrap items-center gap-1">

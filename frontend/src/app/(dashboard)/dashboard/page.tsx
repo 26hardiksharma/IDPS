@@ -86,14 +86,14 @@ export default function DashboardOverviewPage() {
           {isDemo ? (
             <DemoDataBadge />
           ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 rounded border border-border bg-card px-2 py-0.5 text-[11px] font-mono text-muted-foreground">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
               Live Backend
             </span>
           )}
           <button
             onClick={() => refetchMetrics()}
-            className="rounded-md border p-1 text-muted-foreground hover:text-foreground"
+            className="rounded border border-border p-1 text-muted-foreground hover:text-foreground transition-colors"
             title="Refresh Metrics"
           >
             <RefreshCw className={cn("size-3.5", metricsPending && "animate-spin")} />
@@ -101,97 +101,97 @@ export default function DashboardOverviewPage() {
         </div>
       }
     >
-      <div className="space-y-6">
+      <div className="space-y-5">
         <SimulationBanner variant="compact" />
 
         {/* Metric Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase">
+            <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
+              <CardTitle className="text-xs font-medium text-muted-foreground">
                 Analysis Runs
               </CardTitle>
-              <PlaySquare className="size-4 text-muted-foreground" />
+              <PlaySquare className="size-3.5 text-muted-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">{totalRuns}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-2xl font-semibold font-mono text-foreground">{totalRuns}</div>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 {apiMetrics ? `${apiMetrics.completed_runs} completed, ${apiMetrics.failed_runs} failed` : "Completed PCAP executions"}
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase">
+            <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
+              <CardTitle className="text-xs font-medium text-muted-foreground">
                 Total Incidents
               </CardTitle>
-              <ShieldAlert className="size-4 text-rose-500" />
+              <ShieldAlert className="size-3.5 text-muted-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">{totalIncidents}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-2xl font-semibold font-mono text-foreground">{totalIncidents}</div>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 Correlated from raw detections
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase">
-                Evaluations & Provenance
+            <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
+              <CardTitle className="text-xs font-medium text-muted-foreground">
+                Grounded Explanations
               </CardTitle>
-              <BarChart2 className="size-4 text-blue-500" />
+              <BarChart2 className="size-3.5 text-muted-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">
+              <div className="text-2xl font-semibold font-mono text-foreground">
                 {apiMetrics ? `${apiMetrics.valid_explanations}/${apiMetrics.total_explanations}` : "89.0% F1"}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {apiMetrics ? "Valid grounded LLM explanations" : "Hybrid benchmark baseline"}
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {apiMetrics ? "Validated against evidence" : "Hybrid benchmark baseline"}
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-xs font-medium text-muted-foreground uppercase">
-                Safety & Audit Simulations
+            <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
+              <CardTitle className="text-xs font-medium text-muted-foreground">
+                Simulated Actions
               </CardTitle>
-              <Cpu className="size-4 text-emerald-500" />
+              <Cpu className="size-3.5 text-muted-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+              <div className="text-2xl font-semibold font-mono text-foreground">
                 {apiMetrics ? apiMetrics.total_simulations : "Active (Audit)"}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {apiMetrics ? "Total simulation records created" : "Advisory simulations recorded"}
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {apiMetrics ? "Non-executing audit records" : "Advisory simulations recorded"}
               </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Severity Distribution & Detector Breakdown */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           {/* Incident Severity Breakdown */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Incident Severity Breakdown</CardTitle>
-              <CardDescription>
-                Calculated deterministically via weighted scoring factors (not LLM-derived).
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold">Incident Severity Breakdown</CardTitle>
+              <CardDescription className="text-xs">
+                Deterministic risk score bands (not LLM-derived).
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent className="space-y-3 pt-1">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <span className="size-2 rounded-full bg-red-500" /> Critical Severity
+                  <span className="flex items-center gap-1.5 font-medium text-foreground">
+                    <span className="size-1.5 rounded-full bg-red-500" /> Critical Severity
                   </span>
-                  <span className="font-mono font-bold">{criticalCount}</span>
+                  <span className="font-mono font-medium">{criticalCount}</span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 w-full rounded-sm bg-muted overflow-hidden">
                   <div
-                    className="h-full bg-red-500 rounded-full transition-all"
+                    className="h-full bg-red-500/80 transition-all"
                     style={{
                       width: `${totalIncidents > 0 ? (criticalCount / totalIncidents) * 100 : 0}%`,
                     }}
@@ -199,16 +199,16 @@ export default function DashboardOverviewPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <span className="size-2 rounded-full bg-orange-500" /> High Severity
+                  <span className="flex items-center gap-1.5 font-medium text-foreground">
+                    <span className="size-1.5 rounded-full bg-orange-500" /> High Severity
                   </span>
-                  <span className="font-mono font-bold">{highCount}</span>
+                  <span className="font-mono font-medium">{highCount}</span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 w-full rounded-sm bg-muted overflow-hidden">
                   <div
-                    className="h-full bg-orange-500 rounded-full transition-all"
+                    className="h-full bg-orange-500/80 transition-all"
                     style={{
                       width: `${totalIncidents > 0 ? (highCount / totalIncidents) * 100 : 0}%`,
                     }}
@@ -216,16 +216,16 @@ export default function DashboardOverviewPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <span className="size-2 rounded-full bg-amber-500" /> Medium Severity
+                  <span className="flex items-center gap-1.5 font-medium text-foreground">
+                    <span className="size-1.5 rounded-full bg-amber-500" /> Medium Severity
                   </span>
-                  <span className="font-mono font-bold">{mediumCount}</span>
+                  <span className="font-mono font-medium">{mediumCount}</span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 w-full rounded-sm bg-muted overflow-hidden">
                   <div
-                    className="h-full bg-amber-500 rounded-full transition-all"
+                    className="h-full bg-amber-500/80 transition-all"
                     style={{
                       width: `${totalIncidents > 0 ? (mediumCount / totalIncidents) * 100 : 0}%`,
                     }}
@@ -233,16 +233,16 @@ export default function DashboardOverviewPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <span className="size-2 rounded-full bg-blue-500" /> Low Severity
+                  <span className="flex items-center gap-1.5 font-medium text-foreground">
+                    <span className="size-1.5 rounded-full bg-slate-400 dark:bg-slate-500" /> Low Severity
                   </span>
-                  <span className="font-mono font-bold">{lowCount}</span>
+                  <span className="font-mono font-medium">{lowCount}</span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 w-full rounded-sm bg-muted overflow-hidden">
                   <div
-                    className="h-full bg-blue-500 rounded-full transition-all"
+                    className="h-full bg-slate-400 dark:bg-slate-500 transition-all"
                     style={{
                       width: `${totalIncidents > 0 ? (lowCount / totalIncidents) * 100 : 0}%`,
                     }}
@@ -254,42 +254,44 @@ export default function DashboardOverviewPage() {
 
           {/* Detector Contribution */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Detector Contribution</CardTitle>
-              <CardDescription>
-                Detections corroborating between signature-based and anomaly engines.
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold">Detector Contribution</CardTitle>
+              <CardDescription className="text-xs">
+                Signal overlap between signature and statistical engines.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-lg border p-3 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-semibold">Signature Only (Snort 3)</div>
-                  <div className="text-xs text-muted-foreground">
-                    Direct rule matches without statistical anomaly flag
+            <CardContent className="pt-1">
+              <div className="divide-y divide-border text-xs">
+                <div className="py-2.5 flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-foreground">Signature Engine (Snort 3)</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      Direct rule matches without statistical anomaly trigger
+                    </div>
                   </div>
+                  <div className="font-mono font-semibold text-sm text-foreground">{signatureOnly}</div>
                 </div>
-                <div className="text-lg font-mono font-bold">{signatureOnly}</div>
-              </div>
 
-              <div className="rounded-lg border p-3 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-semibold">Anomaly Engine</div>
-                  <div className="text-xs text-muted-foreground">
-                    Statistical / Isolation Forest deviations exceeding threshold
+                <div className="py-2.5 flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-foreground">Anomaly Engine</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      Statistical and isolation forest deviations exceeding baseline
+                    </div>
                   </div>
+                  <div className="font-mono font-semibold text-sm text-foreground">{anomalyOnly}</div>
                 </div>
-                <div className="text-lg font-mono font-bold">{anomalyOnly}</div>
-              </div>
 
-              <div className="rounded-lg border p-3 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-semibold">Hybrid Corroborated Context</div>
-                  <div className="text-xs text-muted-foreground">
-                    Events associated with multi-detector correlation
+                <div className="py-2.5 flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-foreground">Hybrid Corroborated</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      Events corroborated across both signature and anomaly detectors
+                    </div>
                   </div>
-                </div>
-                <div className="text-lg font-mono font-bold text-blue-600 dark:text-blue-400">
-                  {hybridCorroborated}
+                  <div className="font-mono font-semibold text-sm text-foreground">
+                    {hybridCorroborated}
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -300,47 +302,55 @@ export default function DashboardOverviewPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <Crosshair className="size-4 text-rose-500" />
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <Crosshair className="size-3.5 text-muted-foreground" />
                 Enterprise MITRE ATT&CK® Threat Distribution
               </CardTitle>
-              <CardDescription>
-                Adversary tactics and techniques identified across all live correlated detections.
+              <CardDescription className="text-xs">
+                Adversary tactics and techniques identified across live correlated detections.
               </CardDescription>
             </div>
             {mitreMetrics && (
-              <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-2 py-0.5 text-xs font-mono font-medium text-rose-700 dark:text-rose-400">
-                <ShieldCheck className="size-3.5" />
-                {mitreMetrics.total_ttps} TTPs Detected ({mitreMetrics.active_tactics_count} Active Tactics)
+              <span className="inline-flex items-center gap-1.5 rounded border border-border bg-muted/30 px-2 py-0.5 text-[11px] font-mono text-muted-foreground">
+                <ShieldCheck className="size-3 text-muted-foreground" />
+                {mitreMetrics.total_ttps} TTPs ({mitreMetrics.active_tactics_count} Active Tactics)
               </span>
             )}
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Tactics Grid */}
+          <CardContent className="space-y-3 pt-1">
+            {/* Tactics Grid - Calm, Neutral, Non-rainbow */}
             <div className="grid gap-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-8">
               {[
-                { name: "Reconnaissance", key: "Reconnaissance", color: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400" },
-                { name: "Initial Access", key: "Initial Access", color: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400" },
-                { name: "Execution", key: "Execution", color: "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-400" },
-                { name: "Credential Access", key: "Credential Access", color: "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400" },
-                { name: "Discovery", key: "Discovery", color: "border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400" },
-                { name: "Lateral Movement", key: "Lateral Movement", color: "border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-400" },
-                { name: "Exfiltration", key: "Exfiltration", color: "border-pink-500/30 bg-pink-500/10 text-pink-700 dark:text-pink-400" },
-                { name: "Impact", key: "Impact", color: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400" },
+                { name: "Reconnaissance", key: "Reconnaissance" },
+                { name: "Initial Access", key: "Initial Access" },
+                { name: "Execution", key: "Execution" },
+                { name: "Credential Access", key: "Credential Access" },
+                { name: "Discovery", key: "Discovery" },
+                { name: "Lateral Movement", key: "Lateral Movement" },
+                { name: "Exfiltration", key: "Exfiltration" },
+                { name: "Impact", key: "Impact" },
               ].map((tac) => {
                 const count = mitreMetrics?.tactics[tac.key] ?? (tac.key === "Discovery" ? 4 : tac.key === "Reconnaissance" ? 2 : tac.key === "Credential Access" ? 1 : 0);
+                const hasEvents = count > 0;
                 return (
                   <div
                     key={tac.key}
-                    className={`rounded-lg border p-2.5 text-center transition-all ${tac.color}`}
+                    className={cn(
+                      "rounded border p-2 text-left transition-colors",
+                      hasEvents
+                        ? "border-border bg-muted/40"
+                        : "border-border/60 bg-card opacity-60"
+                    )}
                   >
-                    <div className="text-[10px] font-semibold truncate" title={tac.name}>
+                    <div className="text-[10px] font-medium text-muted-foreground truncate" title={tac.name}>
                       {tac.name}
                     </div>
-                    <div className="text-xl font-bold font-mono mt-1">
+                    <div className="text-lg font-semibold font-mono mt-0.5 text-foreground">
                       {count}
                     </div>
-                    <div className="text-[9px] opacity-75 mt-0.5">TTP events</div>
+                    <div className="text-[10px] text-muted-foreground font-mono">
+                      {hasEvents ? "events" : "none"}
+                    </div>
                   </div>
                 );
               })}
@@ -348,19 +358,19 @@ export default function DashboardOverviewPage() {
 
             {/* Top Techniques List */}
             {mitreMetrics && mitreMetrics.top_techniques && mitreMetrics.top_techniques.length > 0 && (
-              <div className="pt-2 border-t">
-                <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+              <div className="pt-2 border-t border-border">
+                <div className="text-[11px] font-medium text-muted-foreground mb-1.5">
                   Top Observed Attack Techniques
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {mitreMetrics.top_techniques.map((tech) => (
                     <div
                       key={tech.technique_id}
-                      className="rounded-md border bg-muted/40 px-2.5 py-1 text-xs flex items-center gap-2"
+                      className="rounded border border-border bg-muted/20 px-2 py-0.5 text-xs flex items-center gap-1.5"
                     >
-                      <span className="font-mono font-bold text-primary">{tech.technique_id}</span>
-                      <span className="text-foreground">{tech.technique_name}</span>
-                      <span className="rounded bg-muted px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground">
+                      <span className="font-mono text-[11px] font-semibold text-foreground/80">{tech.technique_id}</span>
+                      <span className="text-muted-foreground text-xs">{tech.technique_name}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground/80 border-l border-border pl-1.5">
                         {tech.count}x
                       </span>
                     </div>
@@ -373,29 +383,29 @@ export default function DashboardOverviewPage() {
 
         {/* Recent Incidents Snapshot */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
+          <CardHeader className="flex flex-row items-center justify-between pb-2.5">
             <div>
-              <CardTitle className="text-base font-semibold">Recent Incident Queue</CardTitle>
-              <CardDescription>
-                Correlated incident groups awaiting analyst triage or explanation review.
+              <CardTitle className="text-sm font-semibold">Recent Incident Queue</CardTitle>
+              <CardDescription className="text-xs">
+                Correlated incident groups awaiting triage or explanation review.
               </CardDescription>
             </div>
             <Link
               href="/incidents"
-              className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-1.5 text-xs")}
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-1 text-xs h-7 px-2.5")}
             >
-              View All Incidents
-              <ArrowUpRight className="size-3.5" />
+              View All
+              <ArrowUpRight className="size-3" />
             </Link>
           </CardHeader>
-          <CardContent>
-            <div className="divide-y rounded-md border text-sm">
+          <CardContent className="pt-1">
+            <div className="divide-y divide-border rounded border border-border text-sm overflow-hidden">
               {apiIncidents && apiIncidents.length > 0
                 ? apiIncidents.map((inc) => (
                     <Link
                       key={inc.incident_id}
                       href={`/incidents/${inc.incident_id}`}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 gap-2 hover:bg-muted/40 transition-colors block"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 gap-2 hover:bg-muted/30 transition-colors block"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -403,11 +413,11 @@ export default function DashboardOverviewPage() {
                             {inc.incident_id}
                           </span>
                           <SeverityBadge severity={inc.severity} />
-                          <span className="font-semibold text-xs text-foreground">
+                          <span className="font-medium text-xs text-foreground">
                             Run: {inc.run_id}
                           </span>
                         </div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-3">
+                        <div className="text-[11px] text-muted-foreground flex items-center gap-2.5 font-mono">
                           <span>Detections: {inc.detection_count}</span>
                           <span>•</span>
                           <span>Policy: {inc.policy_version_id}</span>
@@ -417,10 +427,10 @@ export default function DashboardOverviewPage() {
                       </div>
                       <div className="flex items-center gap-3 text-xs">
                         <div className="text-right">
-                          <div className="font-mono font-bold">
+                          <div className="font-mono font-semibold">
                             Score: {Math.round(inc.risk_score * 100)}/100
                           </div>
-                          <div className="text-[11px] text-muted-foreground">Deterministic</div>
+                          <div className="text-[10px] text-muted-foreground font-mono">Deterministic</div>
                         </div>
                       </div>
                     </Link>
@@ -429,15 +439,15 @@ export default function DashboardOverviewPage() {
                     <Link
                       key={inc.id}
                       href={`/incidents/${inc.id}`}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 gap-2 hover:bg-muted/40 transition-colors block"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 gap-2 hover:bg-muted/30 transition-colors block"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs text-muted-foreground">{inc.id}</span>
                           <SeverityBadge severity={inc.severity} />
-                          <span className="font-semibold text-xs text-foreground">{inc.title}</span>
+                          <span className="font-medium text-xs text-foreground">{inc.title}</span>
                         </div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-3">
+                        <div className="text-[11px] text-muted-foreground flex items-center gap-2.5 font-mono">
                           <span>Scenario: {inc.scenario}</span>
                           <span>•</span>
                           <span>Detections: {inc.detections_count}</span>
@@ -447,8 +457,8 @@ export default function DashboardOverviewPage() {
                       </div>
                       <div className="flex items-center gap-3 text-xs">
                         <div className="text-right">
-                          <div className="font-mono font-bold">Score: {inc.risk_score}/100</div>
-                          <div className="text-[11px] text-muted-foreground">Deterministic</div>
+                          <div className="font-mono font-semibold">Score: {inc.risk_score}/100</div>
+                          <div className="text-[10px] text-muted-foreground font-mono">Deterministic</div>
                         </div>
                       </div>
                     </Link>

@@ -19,27 +19,27 @@ export function AppSidebar({ className }: { className?: string }) {
       )}
     >
       {/* Brand & Identity */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
-        <div className="flex size-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">
-          <Shield className="size-5" />
+      <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border">
+        <div className="flex size-7 items-center justify-center rounded border border-border bg-muted/60 text-foreground">
+          <Shield className="size-3.5 text-foreground/80" />
         </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="font-bold tracking-tight text-foreground text-sm">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <span className="font-semibold tracking-tight text-foreground text-xs font-mono">
               {siteConfig.name}
             </span>
-            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
+            <span className="text-[10px] font-mono text-muted-foreground">
               v1.0
             </span>
           </div>
-          <p className="text-[11px] text-muted-foreground truncate max-w-[140px]">
-            Security Operations
+          <p className="text-[11px] text-muted-foreground truncate">
+            SecOps Platform
           </p>
         </div>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 space-y-1 p-3 overflow-y-auto" aria-label="Main Navigation">
+      <nav className="flex-1 space-y-0.5 p-2 overflow-y-auto" aria-label="Main Navigation">
         {navigationItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
@@ -49,30 +49,30 @@ export function AppSidebar({ className }: { className?: string }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition-colors",
+                "group relative flex items-center justify-between rounded px-2.5 py-1.5 text-xs transition-colors",
                 isActive
-                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-accent/80 text-foreground font-medium before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-r before:bg-primary"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 min-w-0">
                 <Icon
                   className={cn(
-                    "size-4 shrink-0 transition-colors",
+                    "size-3.5 shrink-0 transition-colors",
                     isActive
-                      ? "text-primary-foreground"
-                      : "text-muted-foreground group-hover:text-foreground"
+                      ? "text-foreground"
+                      : "text-muted-foreground/80 group-hover:text-foreground"
                   )}
                 />
-                <span>{item.title}</span>
+                <span className="truncate">{item.title}</span>
               </div>
               {item.badge && (
                 <span
                   className={cn(
-                    "rounded px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider",
+                    "rounded border px-1 py-0.2 text-[9px] font-mono uppercase tracking-wider",
                     isActive
-                      ? "bg-primary-foreground/20 text-primary-foreground"
-                      : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                      ? "border-primary/30 text-foreground bg-primary/10"
+                      : "border-border text-muted-foreground bg-muted/40"
                   )}
                 >
                   {item.badge}
@@ -84,13 +84,13 @@ export function AppSidebar({ className }: { className?: string }) {
       </nav>
 
       {/* Local Safety Context Footer */}
-      <div className="border-t border-border p-3 m-2 rounded-md bg-muted/40 space-y-2 text-xs">
-        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-          <Cpu className="size-3 text-blue-600 dark:text-blue-400" />
-          <span>Local-First Pipeline</span>
+      <div className="border-t border-border p-3 space-y-1.5 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-1.5 font-mono text-[10px] text-foreground/80 uppercase tracking-wider">
+          <Cpu className="size-3" />
+          <span>Local Engine</span>
         </div>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">
-          Snort 3 + Python ML Anomaly + Ollama (Local LLM). Prevention strictly simulated.
+        <p className="leading-snug">
+          Snort 3 + ML Anomaly + Ollama. Actions simulated only.
         </p>
       </div>
     </aside>
