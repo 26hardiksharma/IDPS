@@ -120,6 +120,7 @@ class IncidentDetailResponse(BaseModel):
     last_seen: Optional[str]
     policy_version_id: str
     detections: list[DetectionSummary]
+    mitre_attack: Optional[list[dict[str, Any]]] = None
     created_at: datetime
     updated_at: datetime
 
@@ -205,3 +206,41 @@ class MetricsSummaryResponse(BaseModel):
     valid_explanations: int
     invalid_explanations: int
     total_simulations: int
+
+
+# ── Interactive AI Analyst & What-If Simulation ──────────────────────────────
+
+class IncidentChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=1000)
+
+
+class IncidentChatResponse(BaseModel):
+    incident_id: str
+    response: str
+    citations: list[str] = Field(default_factory=list)
+    latency_ms: int = 0
+
+
+class WhatIfRequest(BaseModel):
+    signature_weight: float = Field(default=40.0, ge=10.0, le=60.0)
+    anomaly_weight: float = Field(default=30.0, ge=10.0, le=50.0)
+    corroboration_bonus: float = Field(default=10.0, ge=0.0, le=20.0)
+    critical_threshold: float = Field(default=75.0, ge=50.0, le=95.0)
+    high_threshold: float = Field(default=50.0, ge=30.0, le=70.0)
+    medium_threshold: float = Field(default=25.0, ge=10.0, le=45.0)
+
+
+class WhatIfShiftItem(BaseModel):
+    incident_id: str
+    old_score: float
+    new_score: float
+    old_severity: str
+    new_severity: str
+
+
+class WhatIfResponse(BaseModel):
+    total_evaluated: int
+    before_distribution: dict[str, int]
+    after_distribution: dict[str, int]
+    score_shifts: list[WhatIfShiftItem]
+

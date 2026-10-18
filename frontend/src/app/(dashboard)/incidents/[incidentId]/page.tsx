@@ -19,11 +19,14 @@ import {
 import { submitResponseSimulation } from "@/lib/api/services/simulations";
 import { SAMPLE_INCIDENTS } from "@/lib/fixtures/sample-data";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, TerminalSquare, RefreshCw } from "lucide-react";
+import { ArrowLeft, TerminalSquare, RefreshCw, Crosshair } from "lucide-react";
 import { toast } from "sonner";
 import { IncidentStatus } from "@/types/backend";
 import { SeverityLevel } from "@/types/detection";
 import { IncidentStatus as OldIncidentStatus } from "@/types/incident";
+import { MitreAttackCard } from "@/components/incidents/mitre-attack-card";
+import { AiAnalystChat } from "@/components/incidents/ai-analyst-chat";
+import { DossierModal } from "@/components/incidents/dossier-modal";
 
 export default function IncidentDetailPage({
   params,
@@ -34,7 +37,7 @@ export default function IncidentDetailPage({
   const incidentId = resolvedParams.incidentId;
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState<"detections" | "factors" | "simulation">("detections");
+  const [activeTab, setActiveTab] = useState<"detections" | "mitre" | "factors" | "simulation">("detections");
   const [proposedAction, setProposedAction] = useState("isolate_source_ip");
   const [actionTarget, setActionTarget] = useState("");
   const [actionScope, setActionScope] = useState("host");
@@ -139,6 +142,7 @@ export default function IncidentDetailPage({
         model_version_id: "iforest_v1.0",
       },
     ],
+    mitre_attack: [],
     created_at: sampleInc.first_seen,
     updated_at: sampleInc.last_seen,
   };
@@ -163,6 +167,7 @@ export default function IncidentDetailPage({
               Back to Queue
             </Button>
           </Link>
+          <DossierModal incidentId={incidentId} />
           {isDemo ? (
             <DemoDataBadge />
           ) : (
@@ -273,6 +278,9 @@ export default function IncidentDetailPage({
           onRefresh={() => { refetch(); refetchExplanations(); }}
         />
 
+        {/* Interactive AI SOC Analyst Assistant */}
+        <AiAnalystChat incidentId={incidentId} />
+
         {/* Navigation Tabs for Details */}
         <div className="flex items-center gap-2 border-b pb-2 text-xs font-medium">
           <button
@@ -284,6 +292,17 @@ export default function IncidentDetailPage({
             }`}
           >
             Constituent Detections ({displayIncident.detections.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("mitre")}
+            className={`rounded-md px-3 py-1.5 transition-colors flex items-center gap-1.5 ${
+              activeTab === "mitre"
+                ? "bg-muted text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Crosshair className="size-3 text-rose-500" />
+            MITRE ATT&CK® ({displayIncident.mitre_attack?.length || 0})
           </button>
           <button
             onClick={() => setActiveTab("factors")}
@@ -370,7 +389,12 @@ export default function IncidentDetailPage({
           </Card>
         )}
 
-        {/* Tab 2: Scoring Factors */}
+        {/* Tab 2: MITRE ATT&CK Alignment */}
+        {activeTab === "mitre" && (
+          <MitreAttackCard ttps={displayIncident.mitre_attack} />
+        )}
+
+        {/* Tab 3: Scoring Factors */}
         {activeTab === "factors" && (
           <Card>
             <CardHeader>

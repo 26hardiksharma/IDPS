@@ -15,6 +15,8 @@ from app.api.schemas import (
     CreateSimulationRequest,
     DetectionSummary,
     ExplanationResponse,
+    IncidentChatRequest,
+    IncidentChatResponse,
     IncidentDetailResponse,
     IncidentSummaryResponse,
     SimulationResponse,
@@ -113,6 +115,9 @@ async def get_incident(incident_id: str, db: DbDep) -> IncidentDetailResponse:
             )
         )
 
+    from app.correlation.mitre_mapping import map_detections_to_mitre
+    mitre_attack = map_detections_to_mitre([d.model_dump() for d in detections])
+
     return IncidentDetailResponse(
         incident_id=inc.id,
         run_id=inc.run_id,
@@ -125,6 +130,7 @@ async def get_incident(incident_id: str, db: DbDep) -> IncidentDetailResponse:
         last_seen=inc.last_seen,
         policy_version_id=inc.policy_version_id,
         detections=detections,
+        mitre_attack=mitre_attack,
         created_at=inc.created_at,
         updated_at=inc.updated_at,
     )
@@ -172,7 +178,9 @@ async def list_incident_explanations(
                 incident_id=exp.incident_id,
                 model_id=exp.model_id,
                 prompt_version=exp.prompt_version,
-                validation_status=exp.validation_status.value,
+                validation_status=exp.validation_status.value
+                if hasattr(exp.validation_status, "value")
+                else str(exp.validation_status),
                 validated_output=vo,
                 validation_findings=vf,
                 llm_latency_ms=exp.llm_latency_ms,
@@ -217,6 +225,12 @@ async def generate_incident_explanation(
             validation_findings = [f.__dict__ for f in vr.findings]
             if vr.validated_output:
                 validated_output = vr.validated_output.model_dump()
+                validated_output["observed_facts"] = [
+                    o["claim"] if isinstance(o, dict) else o.claim
+                    for o in validated_output.get("observations", [])
+                ]
+                validated_output["recommendations"] = validated_output.get("recommended_next_steps", [])
+                validated_output["limitations"] = validated_output.get("uncertainties", [])
         else:
             validation_status = ValidationStatus.failed
             validation_findings = [
@@ -240,7 +254,7 @@ async def generate_incident_explanation(
         model_id=settings.OLLAMA_MODEL,
         prompt_version=PROMPT_TEMPLATE_VERSION,
         raw_output=raw_output,
-        validation_status=validation_status.value,
+        validation_status=validation_status,
         validated_output=validated_output,
         validation_findings=validation_findings,
         llm_latency_ms=latency_ms,
@@ -265,7 +279,9 @@ async def generate_incident_explanation(
         incident_id=exp.incident_id,
         model_id=exp.model_id,
         prompt_version=exp.prompt_version,
-        validation_status=exp.validation_status.value,
+        validation_status=exp.validation_status.value
+        if hasattr(exp.validation_status, "value")
+        else str(exp.validation_status),
         validated_output=vo,
         validation_findings=vf,
         llm_latency_ms=exp.llm_latency_ms,
@@ -322,3 +338,128 @@ async def create_response_simulation(
         result_json=result_data,
         created_at=audit.created_at,
     )
+
+
+@router.post("/{incident_id}/chat", response_model=IncidentChatResponse)
+async def chat_with_incident_analyst(
+    incident_id: str,
+    body: IncidentChatRequest,
+    db: DbDep,
+) -> IncidentChatResponse:
+    """
+    Interactive SOC Analyst Assistant grounded strictly in this incident's evidence bundle.
+    """
+    import time
+    import httpx
+    from app.core.config import get_settings
+
+    settings = get_settings()
+    repo = ProvenanceRepository(db)
+    incident = await repo.get_incident(incident_id)
+    bundle = await build_evidence_bundle(incident_id, db)
+
+    start_time = time.monotonic()
+    user_query = body.message.strip()
+
+    system_prompt = (
+        "You are an expert SOC Incident Investigator assistant for the XAI-IDPS platform. "
+        "An analyst is asking you a specific question about an intrusion detection incident.\n\n"
+        "STRICT GROUNDING RULES:\n"
+        "1. Answer ONLY using the facts from the incident evidence bundle below.\n"
+        "2. Do NOT invent details, IP addresses, or CVEs not in the bundle.\n"
+        "3. When referring to specific detections or evidence, cite their exact ID (e.g. det_..., ev_...).\n"
+        "4. If asked about containment actions, state clearly that in this system ONLY SIMULATED actions are permitted.\n"
+        "5. Be concise, direct, and professional (2-4 bullet points or short paragraphs).\n\n"
+        f"INCIDENT EVIDENCE BUNDLE:\n{json.dumps(bundle, indent=2)}"
+    )
+
+    reply_text = ""
+    citations: list[str] = []
+
+    try:
+        url = f"{settings.OLLAMA_BASE_URL}/api/chat"
+        payload = {
+            "model": settings.OLLAMA_MODEL,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_query},
+            ],
+            "stream": False,
+            "options": {"temperature": 0.2, "num_predict": 512},
+        }
+        async with httpx.AsyncClient(timeout=25) as client:
+            resp = await client.post(url, json=payload)
+            resp.raise_for_status()
+            reply_text = resp.json()["message"]["content"].strip()
+    except Exception as exc:
+        logger.warning("incident_chat_ollama_fallback", error=str(exc))
+        # Deterministic fallback response grounded in evidence
+        det_names = [d.get("detector_name") for d in bundle.get("detections", [])]
+        reply_text = (
+            f"Based on verified incident records for {incident_id} (Risk Score: {incident.risk_score}/100):\n\n"
+            f"- **Constituent Findings:** {', '.join(det_names[:3]) or 'Statistical anomaly cluster'}\n"
+            f"- **Correlation Basis:** {incident.correlation_reason or 'Temporal window entity match'}\n"
+            f"- **Status:** {incident.status.value.upper()} (Severity: {incident.severity.value.upper()})\n"
+            f"- **Guidance:** Review constituent packet offsets and run a simulated host containment to test isolation safely."
+        )
+
+    latency_ms = int((time.monotonic() - start_time) * 1000)
+
+    # Extract cited IDs
+    all_valid_ids = set(bundle.get("valid_detection_ids", []) + bundle.get("valid_evidence_ids", []))
+    for cid in all_valid_ids:
+        if cid in reply_text:
+            citations.append(cid)
+
+    return IncidentChatResponse(
+        incident_id=incident_id,
+        response=reply_text,
+        citations=citations,
+        latency_ms=latency_ms,
+    )
+
+
+@router.get("/{incident_id}/report")
+async def get_incident_dossier_report(
+    incident_id: str,
+    db: DbDep,
+) -> dict:
+    """
+    Generate an authoritative SOC forensic investigation report dossier.
+    """
+    from app.correlation.mitre_mapping import map_detections_to_mitre
+    from app.reporting.dossier_generator import generate_incident_dossier
+
+    repo = ProvenanceRepository(db)
+    incident = await repo.get_incident(incident_id)
+
+    detections = [link.detection for link in incident.detection_links]
+    mitre_ttps = map_detections_to_mitre([
+        {
+            "detector_name": d.detector_name,
+            "detector_type": d.detector_type.value if hasattr(d.detector_type, "value") else str(d.detector_type),
+            "severity": d.severity,
+            "raw_output_excerpt": d.raw_output_excerpt,
+            "feature_snapshot": d.feature_snapshot,
+        }
+        for d in detections
+    ])
+
+    latest_exp = incident.explanations[-1] if incident.explanations else None
+    simulations = incident.response_audits
+
+    markdown_dossier = generate_incident_dossier(
+        incident=incident,
+        detections=detections,
+        mitre_ttps=mitre_ttps,
+        explanation=latest_exp,
+        simulations=simulations,
+    )
+
+    return {
+        "incident_id": incident_id,
+        "filename": f"SOC_Dossier_{incident_id}.md",
+        "content": markdown_dossier,
+        "mitre_ttps": mitre_ttps,
+    }
+

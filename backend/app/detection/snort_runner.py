@@ -7,6 +7,8 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -20,23 +22,30 @@ logger = get_logger(__name__)
 _SNORT_VERSION_RE = re.compile(r"Snort\+*\s+([\d.]+)")
 
 
-async def get_snort_version(snort_bin: str) -> str:
-    """Return the Snort version string or 'unknown'."""
+def _sync_get_snort_version(snort_bin: str) -> str:
+    if not shutil.which(snort_bin):
+        return "not_installed"
     try:
-        proc = await asyncio.create_subprocess_exec(
-            snort_bin, "--version",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT,
+        res = subprocess.run(
+            [snort_bin, "--version"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=10,
+            check=False,
         )
-        stdout, _ = await proc.communicate()
-        text = stdout.decode(errors="replace")
+        text = res.stdout.decode(errors="replace")
         m = _SNORT_VERSION_RE.search(text)
         return m.group(1) if m else "unknown"
-    except FileNotFoundError:
+    except (FileNotFoundError, PermissionError):
         return "not_installed"
     except Exception as exc:
         logger.warning("snort_version_check_failed", error=str(exc))
         return "unknown"
+
+
+async def get_snort_version(snort_bin: str) -> str:
+    """Return the Snort version string or 'not_installed'."""
+    return await asyncio.to_thread(_sync_get_snort_version, snort_bin)
 
 
 def _build_snort_args(
@@ -65,6 +74,29 @@ def _build_snort_args(
     return args
 
 
+async def is_snort_available() -> bool:
+    """
+    Quick check: is the Snort binary findable and the config present?
+    Returns False when Snort is simply not installed (expected on dev laptops).
+    """
+    settings = get_settings()
+    if not shutil.which(settings.SNORT_BIN):
+        return False
+    version = await get_snort_version(settings.SNORT_BIN)
+    return version != "not_installed"
+
+
+def _sync_run_snort(args: list[str], timeout: int) -> tuple[int, str, str]:
+    res = subprocess.run(
+        args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=timeout,
+        check=False,
+    )
+    return res.returncode, res.stdout.decode(errors="replace"), res.stderr.decode(errors="replace")
+
+
 async def run_snort(
     pcap_path: Path,
     run_id: str,
@@ -79,6 +111,17 @@ async def run_snort(
 
     output_dir = settings.SNORT_OUTPUT_DIR / run_id
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Check binary availability first — clearer error than config-not-found
+    snort_available = await is_snort_available()
+    if not snort_available:
+        raise SnortError(
+            "Snort binary not found",
+            detail=(
+                f"SNORT_BIN='{settings.SNORT_BIN}' is not installed or not in PATH. "
+                "Install Snort 3 or set SNORT_BIN to the full path of the binary."
+            ),
+        )
 
     config_path = settings.SNORT_CONFIG
     rules_path = settings.SNORT_RULES_DIR / "local.rules"
@@ -99,40 +142,30 @@ async def run_snort(
 
     logger.info("snort_starting", run_id=run_id, args=args)
     try:
-        proc = await asyncio.create_subprocess_exec(
-            *args,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
+        returncode, stdout_text, stderr_text = await asyncio.to_thread(
+            _sync_run_snort, args, timeout
         )
-        try:
-            stdout, stderr = await asyncio.wait_for(
-                proc.communicate(), timeout=timeout
-            )
-        except asyncio.TimeoutError:
-            proc.kill()
-            raise SnortError(
-                "Snort timed out",
-                detail=f"Exceeded {timeout}s timeout for run {run_id}",
-            )
-    except FileNotFoundError:
+    except subprocess.TimeoutExpired:
         raise SnortError(
-            "Snort binary not found",
-            detail=f"SNORT_BIN={settings.SNORT_BIN}",
+            "Snort timed out",
+            detail=f"Exceeded {timeout}s timeout for run {run_id}",
+        )
+    except (FileNotFoundError, OSError) as exc:
+        raise SnortError(
+            "Snort binary could not be executed",
+            detail=f"SNORT_BIN={settings.SNORT_BIN}: {exc}",
         )
 
-    stdout_text = stdout.decode(errors="replace")
-    stderr_text = stderr.decode(errors="replace")
-
-    if proc.returncode not in (0, 1):  # Snort returns 1 when alerts fired
+    if returncode not in (0, 1):  # Snort returns 1 when alerts fired
         raise SnortError(
-            f"Snort exited with code {proc.returncode}",
+            f"Snort exited with code {returncode}",
             detail=stderr_text[:2000],
         )
 
     logger.info(
         "snort_finished",
         run_id=run_id,
-        return_code=proc.returncode,
+        return_code=returncode,
         output_dir=str(output_dir),
     )
 

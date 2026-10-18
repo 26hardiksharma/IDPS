@@ -21,6 +21,10 @@ export const API_ENDPOINTS = {
       `/api/incidents/${encodeURIComponent(incidentId)}/explanations`,
     responseSimulations: (incidentId: string) =>
       `/api/incidents/${encodeURIComponent(incidentId)}/response-simulations`,
+    chat: (incidentId: string) =>
+      `/api/incidents/${encodeURIComponent(incidentId)}/chat`,
+    report: (incidentId: string) =>
+      `/api/incidents/${encodeURIComponent(incidentId)}/report`,
   },
 
   // Explanations
@@ -38,6 +42,8 @@ export const API_ENDPOINTS = {
   // Metrics
   metrics: {
     overview: "/api/metrics",
+    mitre: "/api/metrics/mitre",
+    whatIf: "/api/metrics/what-if",
   },
 
   // Standalone response simulation audit log

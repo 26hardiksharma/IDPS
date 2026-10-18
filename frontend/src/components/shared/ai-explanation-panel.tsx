@@ -121,14 +121,26 @@ export function AiExplanationPanel({
                       <ShieldCheck className="size-3.5" /> Observed Evidence (Verified)
                     </div>
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      {Array.isArray(validatedContent.observed_facts) &&
-                      validatedContent.observed_facts.length > 0 ? (
-                        validatedContent.observed_facts.map((fact: unknown, i: number) => (
-                          <li key={i}>{typeof fact === "string" ? fact : JSON.stringify(fact)}</li>
-                        ))
-                      ) : (
-                        <li>Verified packet timestamps & addresses corroborated.</li>
-                      )}
+                      {(() => {
+                        const obsList =
+                          Array.isArray(validatedContent.observed_facts) && validatedContent.observed_facts.length > 0
+                            ? validatedContent.observed_facts
+                            : Array.isArray(validatedContent.observations) && validatedContent.observations.length > 0
+                            ? validatedContent.observations
+                            : [];
+                        if (obsList.length > 0) {
+                          return obsList.map((fact: unknown, i: number) => {
+                            const text =
+                              typeof fact === "string"
+                                ? fact
+                                : typeof fact === "object" && fact !== null && "claim" in fact
+                                ? String((fact as { claim: unknown }).claim)
+                                : JSON.stringify(fact);
+                            return <li key={i}>{text}</li>;
+                          });
+                        }
+                        return <li>Verified packet timestamps & addresses corroborated.</li>;
+                      })()}
                     </ul>
                   </div>
 
@@ -139,9 +151,25 @@ export function AiExplanationPanel({
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                       {Array.isArray(validatedContent.interpretations) &&
                       validatedContent.interpretations.length > 0 ? (
-                        validatedContent.interpretations.map((interp: unknown, i: number) => (
-                          <li key={i}>{typeof interp === "string" ? interp : JSON.stringify(interp)}</li>
-                        ))
+                        validatedContent.interpretations.map((interp: unknown, i: number) => {
+                          if (typeof interp === "string") {
+                            return <li key={i}>{interp}</li>;
+                          }
+                          if (typeof interp === "object" && interp !== null && "claim" in interp) {
+                            const obj = interp as { claim: unknown; confidence?: unknown };
+                            return (
+                              <li key={i}>
+                                <span>{String(obj.claim)}</span>
+                                {Boolean(obj.confidence) && (
+                                  <span className="ml-1.5 inline-block text-[10px] font-mono rounded px-1 bg-amber-500/15 text-amber-700 dark:text-amber-400">
+                                    {String(obj.confidence)} confidence
+                                  </span>
+                                )}
+                              </li>
+                            );
+                          }
+                          return <li key={i}>{JSON.stringify(interp)}</li>;
+                        })
                       ) : (
                         <li>Potential reconnaissance or rate anomaly profile.</li>
                       )}
@@ -150,19 +178,35 @@ export function AiExplanationPanel({
                 </div>
 
                 {/* Safe Recommendations */}
-                {Array.isArray(validatedContent.recommendations) &&
-                  validatedContent.recommendations.length > 0 && (
-                    <div className="rounded-md border bg-background p-3">
-                      <div className="font-semibold text-foreground mb-1">
-                        Analyst Action Recommendations (Advisory Only)
+                {(() => {
+                  const recList =
+                    Array.isArray(validatedContent.recommendations) && validatedContent.recommendations.length > 0
+                      ? validatedContent.recommendations
+                      : Array.isArray(validatedContent.recommended_next_steps) && validatedContent.recommended_next_steps.length > 0
+                      ? validatedContent.recommended_next_steps
+                      : [];
+                  if (recList.length > 0) {
+                    return (
+                      <div className="rounded-md border bg-background p-3">
+                        <div className="font-semibold text-foreground mb-1">
+                          Analyst Action Recommendations (Advisory Only)
+                        </div>
+                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                          {recList.map((rec: unknown, i: number) => {
+                            const text =
+                              typeof rec === "string"
+                                ? rec
+                                : typeof rec === "object" && rec !== null && "claim" in rec
+                                ? String((rec as { claim: unknown }).claim)
+                                : JSON.stringify(rec);
+                            return <li key={i}>{text}</li>;
+                          })}
+                        </ul>
                       </div>
-                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                        {validatedContent.recommendations.map((rec: unknown, i: number) => (
-                          <li key={i}>{typeof rec === "string" ? rec : JSON.stringify(rec)}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             ) : (
               <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200">

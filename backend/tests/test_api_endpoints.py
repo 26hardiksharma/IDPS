@@ -126,3 +126,35 @@ async def test_run_creation_and_execution_lifecycle():
         sim_list = sim_list_res.json()
         assert len(sim_list) >= 1
         assert sim_list[0]["simulated_only"] is True
+
+        # 10. Generate explanation
+        from unittest.mock import patch
+        mock_output = (
+            '{"incident_id": "' + incident_id + '", "summary": "Port scan detected", '
+            '"observations": [{"claim": "Scanning ports", "evidence_ids": [], "validation_type": "other"}], '
+            '"interpretations": [{"claim": "Recon activity", "evidence_ids": [], "confidence": "moderate"}], '
+            '"evidence_references": [], "uncertainties": [], "recommended_next_steps": ["Review firewall"]}'
+        )
+        with patch("app.api.incidents.generate_explanation", return_value=(mock_output, 120)):
+            exp_res = await ac.post(f"/api/incidents/{incident_id}/explanations")
+            assert exp_res.status_code == 201
+            exp_data = exp_res.json()
+            assert exp_data["incident_id"] == incident_id
+            assert exp_data["validation_status"] in ("valid", "partially_valid")
+            assert exp_data["validated_output"] is not None
+            assert exp_data["validated_output"]["summary"] == "Port scan detected"
+            assert "observed_facts" in exp_data["validated_output"]
+            assert "recommendations" in exp_data["validated_output"]
+
+        # 11. List incident explanations
+        list_exp_res = await ac.get(f"/api/incidents/{incident_id}/explanations")
+        assert list_exp_res.status_code == 200
+        exps = list_exp_res.json()
+        assert len(exps) >= 1
+        assert exps[0]["incident_id"] == incident_id
+
+        # 12. Get explanation by ID
+        exp_id = exp_data["explanation_id"]
+        get_exp_res = await ac.get(f"/api/explanations/{exp_id}")
+        assert get_exp_res.status_code == 200
+        assert get_exp_res.json()["explanation_id"] == exp_id

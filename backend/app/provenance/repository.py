@@ -27,6 +27,7 @@ from app.db.models import (
     ResponseAudit,
     RunStatus,
     SimulationStatus,
+    ValidationStatus,
 )
 from app.provenance.id_factory import new_id
 
@@ -311,11 +312,16 @@ class ProvenanceRepository:
         model_id: str,
         prompt_version: str,
         raw_output: str | None,
-        validation_status: str,
+        validation_status: str | ValidationStatus,
         validated_output: dict | None = None,
         validation_findings: list | None = None,
         llm_latency_ms: int | None = None,
     ) -> Explanation:
+        if isinstance(validation_status, str):
+            try:
+                validation_status = ValidationStatus(validation_status)
+            except ValueError:
+                pass
         exp = Explanation(
             id=new_id("exp"),
             incident_id=incident_id,

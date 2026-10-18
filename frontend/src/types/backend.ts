@@ -85,6 +85,16 @@ export interface IncidentSummaryResponse {
   created_at: string;
 }
 
+export interface MitreTTP {
+  tactic: string;
+  technique_id: string;
+  technique_name: string;
+  confidence: string;
+  description: string;
+  evidence_trigger: string;
+  url: string;
+}
+
 export interface IncidentDetailResponse {
   incident_id: string;
   run_id: string;
@@ -97,8 +107,62 @@ export interface IncidentDetailResponse {
   last_seen?: string | null;
   policy_version_id: string;
   detections: DetectionSummary[];
+  mitre_attack?: MitreTTP[];
   created_at: string;
   updated_at: string;
+}
+
+export interface IncidentChatRequest {
+  message: string;
+}
+
+export interface IncidentChatResponse {
+  incident_id: string;
+  response: string;
+  citations: string[];
+  latency_ms: number;
+}
+
+export interface IncidentDossierResponse {
+  incident_id: string;
+  filename: string;
+  content: string;
+  mitre_ttps: MitreTTP[];
+}
+
+export interface MitreMetricsResponse {
+  total_ttps: number;
+  tactics: Record<string, number>;
+  top_techniques: Array<{
+    technique_id: string;
+    technique_name: string;
+    tactic: string;
+    count: number;
+  }>;
+  active_tactics_count: number;
+}
+
+export interface WhatIfPolicyRequest {
+  signature_weight?: number;
+  anomaly_weight?: number;
+  corroboration_bonus?: number;
+  critical_threshold?: number;
+  high_threshold?: number;
+  medium_threshold?: number;
+}
+
+export interface WhatIfPolicyResponse {
+  total_evaluated: number;
+  before_distribution: Record<string, number>;
+  after_distribution: Record<string, number>;
+  score_shifts: Array<{
+    incident_id: string;
+    old_score: number;
+    new_score: number;
+    old_severity: string;
+    new_severity: string;
+    changed: boolean;
+  }>;
 }
 
 export interface UpdateIncidentStatusRequest {

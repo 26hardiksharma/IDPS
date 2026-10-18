@@ -191,21 +191,21 @@ export default function RunDetailPage({ params }: { params: Promise<{ runId: str
             <div className="grid gap-4 sm:grid-cols-3 text-xs">
               <div className="rounded-md border p-3">
                 <div className="text-muted-foreground">Created At</div>
-                <div className="font-mono font-medium text-foreground mt-1">
+                <div className="font-mono font-medium text-foreground mt-1" suppressHydrationWarning>
                   {new Date(displayRun.created_at).toLocaleString()}
                 </div>
               </div>
 
               <div className="rounded-md border p-3">
                 <div className="text-muted-foreground">Started At</div>
-                <div className="font-mono font-medium text-foreground mt-1">
+                <div className="font-mono font-medium text-foreground mt-1" suppressHydrationWarning>
                   {displayRun.started_at ? new Date(displayRun.started_at).toLocaleString() : "Not started"}
                 </div>
               </div>
 
               <div className="rounded-md border p-3">
                 <div className="text-muted-foreground">Finished At</div>
-                <div className="font-mono font-medium text-foreground mt-1">
+                <div className="font-mono font-medium text-foreground mt-1" suppressHydrationWarning>
                   {displayRun.finished_at ? new Date(displayRun.finished_at).toLocaleString() : "In progress / Pending"}
                 </div>
               </div>

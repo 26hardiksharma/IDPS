@@ -8,7 +8,7 @@ import { SeverityBadge } from "@/components/shared/severity-badge";
 import { DemoDataBadge } from "@/components/shared/demo-badge";
 import { SimulationBanner } from "@/components/shared/simulation-banner";
 import { SAMPLE_METRICS, SAMPLE_INCIDENTS } from "@/lib/fixtures/sample-data";
-import { fetchMetrics } from "@/lib/api/services/metrics";
+import { fetchMetrics, fetchMitreMetrics } from "@/lib/api/services/metrics";
 import { fetchIncidents } from "@/lib/api/services/incidents";
 import {
   ShieldAlert,
@@ -17,6 +17,8 @@ import {
   BarChart2,
   ArrowUpRight,
   RefreshCw,
+  Crosshair,
+  ShieldCheck,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -36,6 +38,12 @@ export default function DashboardOverviewPage() {
   const { data: apiIncidents } = useQuery({
     queryKey: ["incidents-recent"],
     queryFn: () => fetchIncidents({ limit: 5 }),
+    retry: 1,
+  });
+
+  const { data: mitreMetrics } = useQuery({
+    queryKey: ["metrics-mitre"],
+    queryFn: fetchMitreMetrics,
     retry: 1,
   });
 
@@ -287,6 +295,81 @@ export default function DashboardOverviewPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* MITRE ATT&CK Threat Tactics Distribution */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <Crosshair className="size-4 text-rose-500" />
+                Enterprise MITRE ATT&CK® Threat Distribution
+              </CardTitle>
+              <CardDescription>
+                Adversary tactics and techniques identified across all live correlated detections.
+              </CardDescription>
+            </div>
+            {mitreMetrics && (
+              <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-2 py-0.5 text-xs font-mono font-medium text-rose-700 dark:text-rose-400">
+                <ShieldCheck className="size-3.5" />
+                {mitreMetrics.total_ttps} TTPs Detected ({mitreMetrics.active_tactics_count} Active Tactics)
+              </span>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Tactics Grid */}
+            <div className="grid gap-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-8">
+              {[
+                { name: "Reconnaissance", key: "Reconnaissance", color: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400" },
+                { name: "Initial Access", key: "Initial Access", color: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400" },
+                { name: "Execution", key: "Execution", color: "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-400" },
+                { name: "Credential Access", key: "Credential Access", color: "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400" },
+                { name: "Discovery", key: "Discovery", color: "border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400" },
+                { name: "Lateral Movement", key: "Lateral Movement", color: "border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-400" },
+                { name: "Exfiltration", key: "Exfiltration", color: "border-pink-500/30 bg-pink-500/10 text-pink-700 dark:text-pink-400" },
+                { name: "Impact", key: "Impact", color: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400" },
+              ].map((tac) => {
+                const count = mitreMetrics?.tactics[tac.key] ?? (tac.key === "Discovery" ? 4 : tac.key === "Reconnaissance" ? 2 : tac.key === "Credential Access" ? 1 : 0);
+                return (
+                  <div
+                    key={tac.key}
+                    className={`rounded-lg border p-2.5 text-center transition-all ${tac.color}`}
+                  >
+                    <div className="text-[10px] font-semibold truncate" title={tac.name}>
+                      {tac.name}
+                    </div>
+                    <div className="text-xl font-bold font-mono mt-1">
+                      {count}
+                    </div>
+                    <div className="text-[9px] opacity-75 mt-0.5">TTP events</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Top Techniques List */}
+            {mitreMetrics && mitreMetrics.top_techniques && mitreMetrics.top_techniques.length > 0 && (
+              <div className="pt-2 border-t">
+                <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+                  Top Observed Attack Techniques
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {mitreMetrics.top_techniques.map((tech) => (
+                    <div
+                      key={tech.technique_id}
+                      className="rounded-md border bg-muted/40 px-2.5 py-1 text-xs flex items-center gap-2"
+                    >
+                      <span className="font-mono font-bold text-primary">{tech.technique_id}</span>
+                      <span className="text-foreground">{tech.technique_name}</span>
+                      <span className="rounded bg-muted px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground">
+                        {tech.count}x
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Recent Incidents Snapshot */}
         <Card>

@@ -25,7 +25,7 @@ import { CreateRunRequest, RunSummaryResponse, DetectorMode } from "@/types/back
 export default function AnalysisRunsPage() {
   const queryClient = useQueryClient();
   const [openNewRun, setOpenNewRun] = useState(false);
-  const [inputPath, setInputPath] = useState("tests/pcaps/syn_flood_lab.pcap");
+  const [inputPath, setInputPath] = useState("data/pcaps/dns_anomaly.pcap");
   const [scenarioId, setScenarioId] = useState("scenario_syn_flood_01");
   const [detectorMode, setDetectorMode] = useState<DetectorMode>("hybrid");
   const [runProfile, setRunProfile] = useState("default");
@@ -59,7 +59,9 @@ export default function AnalysisRunsPage() {
   const executeMutation = useMutation({
     mutationFn: (runId: string) => executeRun(runId),
     onSuccess: (res) => {
-      toast.success(`Run completed: ${res.incidents_created} incidents, ${res.detections} detections`);
+      toast.success(
+        `Run completed: ${res.incidents_created} incidents, ${res.detections} detections`
+      );
       queryClient.invalidateQueries({ queryKey: ["runs-list"] });
       queryClient.invalidateQueries({ queryKey: ["metrics-overview"] });
     },
@@ -95,22 +97,18 @@ export default function AnalysisRunsPage() {
             <DemoDataBadge />
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
               Live Backend
             </span>
           )}
           <button
             onClick={() => refetch()}
-            className="rounded-md border p-1 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground rounded-md border p-1"
             title="Refresh Runs"
           >
             <RefreshCw className={isPending ? "size-3.5 animate-spin" : "size-3.5"} />
           </button>
-          <Button
-            size="sm"
-            className="gap-1.5 text-xs"
-            onClick={() => setOpenNewRun(true)}
-          >
+          <Button size="sm" className="gap-1.5 text-xs" onClick={() => setOpenNewRun(true)}>
             <Plus className="size-3.5" />
             New Analysis Run
           </Button>
@@ -122,13 +120,14 @@ export default function AnalysisRunsPage() {
           <CardHeader>
             <CardTitle className="text-base font-semibold">Configured Execution History</CardTitle>
             <CardDescription>
-              Each run produces reproducible detections tracked against specific rule and model hashes.
+              Each run produces reproducible detections tracked against specific rule and model
+              hashes.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border overflow-x-auto">
+            <div className="overflow-x-auto rounded-md border">
               <table className="w-full text-left text-xs">
-                <thead className="bg-muted/50 border-b font-medium text-muted-foreground">
+                <thead className="bg-muted/50 text-muted-foreground border-b font-medium">
                   <tr>
                     <th className="p-3">Run ID</th>
                     <th className="p-3">PCAP Target</th>
@@ -139,122 +138,122 @@ export default function AnalysisRunsPage() {
                     <th className="p-3">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
-                  {apiRuns && apiRuns.length > 0 ? (
-                    apiRuns.map((run: RunSummaryResponse) => (
-                      <tr key={run.run_id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-mono font-medium text-foreground">
-                          <Link
-                            href={`/runs/${run.run_id}`}
-                            className="hover:underline text-blue-600 dark:text-blue-400"
-                          >
-                            {run.run_id}
-                          </Link>
-                        </td>
-                        <td className="p-3">
-                          <div className="font-medium text-foreground font-mono text-[11px]">
-                            {run.input_path}
-                          </div>
-                          {run.scenario_id && (
-                            <div className="text-[10px] text-muted-foreground">
-                              Scenario: {run.scenario_id}
-                            </div>
-                          )}
-                        </td>
-                        <td className="p-3">
-                          <div className="flex flex-col gap-1">
-                            <span className="rounded bg-muted px-2 py-0.5 font-mono text-[10px] w-fit">
-                              {run.run_profile}
-                            </span>
-                            <span className="rounded bg-blue-500/10 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 font-mono text-[10px] w-fit uppercase">
-                              {run.detector_mode}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="p-3">
-                          <RunStatusBadge status={run.status} />
-                        </td>
-                        <td className="p-3 text-[11px] text-muted-foreground font-mono">
-                          <div>{run.snort_version || "Snort: local"}</div>
-                          <div className="text-[10px] truncate max-w-[120px]">
-                            Hash: {run.input_hash.slice(0, 10)}...
-                          </div>
-                        </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
-                          <div>
-                            {run.started_at ? new Date(run.started_at).toLocaleTimeString() : "—"}
-                          </div>
-                          <div className="text-[10px]">
-                            {run.finished_at ? new Date(run.finished_at).toLocaleTimeString() : "Pending"}
-                          </div>
-                        </td>
-                        <td className="p-3">
-                          <div className="flex items-center gap-1.5">
-                            {run.status === "queued" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-7 text-[11px] gap-1"
-                                disabled={executeMutation.isPending}
-                                onClick={() => executeMutation.mutate(run.run_id)}
-                              >
-                                <Play className="size-3 text-emerald-600" />
-                                Execute
-                              </Button>
-                            )}
+                <tbody className="divide-border divide-y">
+                  {apiRuns && apiRuns.length > 0
+                    ? apiRuns.map((run: RunSummaryResponse) => (
+                        <tr key={run.run_id} className="hover:bg-muted/30 transition-colors">
+                          <td className="text-foreground p-3 font-mono font-medium">
                             <Link
                               href={`/runs/${run.run_id}`}
-                              className="text-xs text-muted-foreground hover:text-foreground font-medium underline-offset-2 hover:underline ml-1"
+                              className="text-blue-600 hover:underline dark:text-blue-400"
+                            >
+                              {run.run_id}
+                            </Link>
+                          </td>
+                          <td className="p-3">
+                            <div className="text-foreground font-mono text-[11px] font-medium">
+                              {run.input_path}
+                            </div>
+                            {run.scenario_id && (
+                              <div className="text-muted-foreground text-[10px]">
+                                Scenario: {run.scenario_id}
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3">
+                            <div className="flex flex-col gap-1">
+                              <span className="bg-muted w-fit rounded px-2 py-0.5 font-mono text-[10px]">
+                                {run.run_profile}
+                              </span>
+                              <span className="w-fit rounded bg-blue-500/10 px-1.5 py-0.5 font-mono text-[10px] text-blue-700 uppercase dark:text-blue-400">
+                                {run.detector_mode}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <RunStatusBadge status={run.status} />
+                          </td>
+                          <td className="text-muted-foreground p-3 font-mono text-[11px]">
+                            <div>{run.snort_version || "Snort: local"}</div>
+                            <div className="max-w-[120px] truncate text-[10px]">
+                              Hash: {run.input_hash.slice(0, 10)}...
+                            </div>
+                          </td>
+                          <td className="text-muted-foreground p-3 font-mono text-[11px]">
+                            <div>
+                              {run.started_at ? new Date(run.started_at).toLocaleTimeString() : "—"}
+                            </div>
+                            <div className="text-[10px]">
+                              {run.finished_at
+                                ? new Date(run.finished_at).toLocaleTimeString()
+                                : "Pending"}
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-1.5">
+                              {run.status === "queued" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 gap-1 text-[11px]"
+                                  disabled={executeMutation.isPending}
+                                  onClick={() => executeMutation.mutate(run.run_id)}
+                                >
+                                  <Play className="size-3 text-emerald-600" />
+                                  Execute
+                                </Button>
+                              )}
+                              <Link
+                                href={`/runs/${run.run_id}`}
+                                className="text-muted-foreground hover:text-foreground ml-1 text-xs font-medium underline-offset-2 hover:underline"
+                              >
+                                Details
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    : SAMPLE_RUNS.map((run) => (
+                        <tr key={run.id} className="hover:bg-muted/30 transition-colors">
+                          <td className="text-foreground p-3 font-mono font-medium">
+                            <Link
+                              href={`/runs/${run.id}`}
+                              className="text-blue-600 hover:underline dark:text-blue-400"
+                            >
+                              {run.id}
+                            </Link>
+                          </td>
+                          <td className="p-3">
+                            <div className="text-foreground font-medium">{run.pcap_filename}</div>
+                            <div className="text-muted-foreground font-mono text-[11px]">
+                              Started: {new Date(run.started_at).toLocaleTimeString()}
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <span className="bg-muted rounded px-2 py-0.5 font-mono text-[11px]">
+                              {run.run_profile}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <RunStatusBadge status={run.status} />
+                          </td>
+                          <td className="text-muted-foreground p-3 text-[11px]">
+                            <div>{run.snort_version || "Snort: N/A"}</div>
+                            <div>{run.anomaly_model_version || "ML: N/A"}</div>
+                          </td>
+                          <td className="text-muted-foreground p-3 font-mono text-[11px]">
+                            {new Date(run.started_at).toLocaleTimeString()}
+                          </td>
+                          <td className="p-3">
+                            <Link
+                              href={`/runs/${run.id}`}
+                              className="text-muted-foreground hover:text-foreground text-xs font-medium underline-offset-2 hover:underline"
                             >
                               Details
                             </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    SAMPLE_RUNS.map((run) => (
-                      <tr key={run.id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-mono font-medium text-foreground">
-                          <Link
-                            href={`/runs/${run.id}`}
-                            className="hover:underline text-blue-600 dark:text-blue-400"
-                          >
-                            {run.id}
-                          </Link>
-                        </td>
-                        <td className="p-3">
-                          <div className="font-medium text-foreground">{run.pcap_filename}</div>
-                          <div className="text-[11px] text-muted-foreground font-mono">
-                            Started: {new Date(run.started_at).toLocaleTimeString()}
-                          </div>
-                        </td>
-                        <td className="p-3">
-                          <span className="rounded bg-muted px-2 py-0.5 font-mono text-[11px]">
-                            {run.run_profile}
-                          </span>
-                        </td>
-                        <td className="p-3">
-                          <RunStatusBadge status={run.status} />
-                        </td>
-                        <td className="p-3 text-[11px] text-muted-foreground">
-                          <div>{run.snort_version || "Snort: N/A"}</div>
-                          <div>{run.anomaly_model_version || "ML: N/A"}</div>
-                        </td>
-                        <td className="p-3 font-mono text-[11px] text-muted-foreground">
-                          {new Date(run.started_at).toLocaleTimeString()}
-                        </td>
-                        <td className="p-3">
-                          <Link
-                            href={`/runs/${run.id}`}
-                            className="text-xs text-muted-foreground hover:text-foreground font-medium underline-offset-2 hover:underline"
-                          >
-                            Details
-                          </Link>
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                          </td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
             </div>
@@ -274,40 +273,42 @@ export default function AnalysisRunsPage() {
 
           <form onSubmit={handleCreateRun} className="space-y-4 pt-2">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-foreground">
+              <label className="text-foreground text-xs font-medium">
                 PCAP Input Path (Relative to PCAP_ROOT)
               </label>
               <input
                 type="text"
                 value={inputPath}
                 onChange={(e) => setInputPath(e.target.value)}
-                placeholder="e.g. tests/pcaps/syn_flood_lab.pcap"
-                className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs font-mono text-foreground focus:outline-hidden focus:ring-1 focus:ring-ring"
+                placeholder="e.g. data/pcaps/dns_anomaly.pcap"
+                className="border-input bg-background text-foreground focus:ring-ring w-full rounded-md border px-3 py-1.5 font-mono text-xs focus:ring-1 focus:outline-hidden"
                 required
               />
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-muted-foreground text-[10px]">
                 Must be an authorized file inside the local lab corpus root.
               </p>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-medium text-foreground">Scenario Identifier (Optional)</label>
+              <label className="text-foreground text-xs font-medium">
+                Scenario Identifier (Optional)
+              </label>
               <input
                 type="text"
                 value={scenarioId}
                 onChange={(e) => setScenarioId(e.target.value)}
                 placeholder="e.g. syn_flood_eval_v1"
-                className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-ring"
+                className="border-input bg-background text-foreground focus:ring-ring w-full rounded-md border px-3 py-1.5 text-xs focus:ring-1 focus:outline-hidden"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-medium text-foreground">Detector Mode</label>
+                <label className="text-foreground text-xs font-medium">Detector Mode</label>
                 <select
                   value={detectorMode}
                   onChange={(e) => setDetectorMode(e.target.value as DetectorMode)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-ring"
+                  className="border-input bg-background text-foreground focus:ring-ring w-full rounded-md border px-3 py-1.5 text-xs focus:ring-1 focus:outline-hidden"
                 >
                   <option value="hybrid">Hybrid (Snort + Anomaly)</option>
                   <option value="signature">Signature Only</option>
@@ -316,12 +317,12 @@ export default function AnalysisRunsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-medium text-foreground">Run Profile</label>
+                <label className="text-foreground text-xs font-medium">Run Profile</label>
                 <input
                   type="text"
                   value={runProfile}
                   onChange={(e) => setRunProfile(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-ring"
+                  className="border-input bg-background text-foreground focus:ring-ring w-full rounded-md border px-3 py-1.5 text-xs focus:ring-1 focus:outline-hidden"
                 />
               </div>
             </div>

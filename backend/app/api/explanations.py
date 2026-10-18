@@ -43,7 +43,9 @@ async def get_explanation(explanation_id: str, db: DbDep) -> ExplanationResponse
         incident_id=exp.incident_id,
         model_id=exp.model_id,
         prompt_version=exp.prompt_version,
-        validation_status=exp.validation_status.value,
+        validation_status=exp.validation_status.value
+        if hasattr(exp.validation_status, "value")
+        else str(exp.validation_status),
         validated_output=vo,
         validation_findings=vf,
         llm_latency_ms=exp.llm_latency_ms,

@@ -71,3 +71,33 @@ export async function fetchExplanation(
   );
   return response.data;
 }
+
+export async function askIncidentAi(
+  incidentId: string,
+  message: string
+): Promise<{ incident_id: string; response: string; citations: string[]; latency_ms: number }> {
+  const response = await apiClient.post<{
+    incident_id: string;
+    response: string;
+    citations: string[];
+    latency_ms: number;
+  }>(API_ENDPOINTS.incidents.chat(incidentId), { message });
+  return response.data;
+}
+
+export async function fetchIncidentDossier(
+  incidentId: string
+): Promise<{
+  incident_id: string;
+  filename: string;
+  content: string;
+  mitre_ttps: import("@/types/backend").MitreTTP[];
+}> {
+  const response = await apiClient.get<{
+    incident_id: string;
+    filename: string;
+    content: string;
+    mitre_ttps: import("@/types/backend").MitreTTP[];
+  }>(API_ENDPOINTS.incidents.report(incidentId));
+  return response.data;
+}

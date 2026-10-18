@@ -16,6 +16,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Trophy, ShieldCheck, Database, RefreshCw } from "lucide-react";
+import { WhatIfSandbox } from "@/components/evaluation/what-if-sandbox";
 
 const COMPARISON_DATA = [
   {
@@ -222,6 +223,9 @@ export default function EvaluationPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* What-If Policy Calibration Sandbox */}
+        <WhatIfSandbox />
       </div>
     </PageContainer>
   );

@@ -133,6 +133,12 @@ def _validate_references(
     valid_ids.update(bundle.get("valid_evidence_ids", []))
     valid_ids.update(bundle.get("valid_detection_ids", []))
     valid_ids.update(bundle.get("valid_rule_version_ids", []))
+    if bundle.get("incident_id"):
+        valid_ids.add(bundle["incident_id"])
+    if bundle.get("run_id"):
+        valid_ids.add(bundle["run_id"])
+    if bundle.get("policy_version_id"):
+        valid_ids.add(bundle["policy_version_id"])
 
     # Check incident_id
     if parsed.incident_id != bundle.get("incident_id"):
@@ -225,8 +231,10 @@ def _validate_consistency(
     # Check risk score if mentioned
     risk_score = bundle.get("risk_score")
     if risk_score is not None:
+        # Strip IP addresses from summary before looking for numeric risk scores
+        clean_summary = re.sub(r"\b\d{1,3}(?:\.\d{1,3}){3}\b", "", parsed.summary)
         score_pattern = re.compile(r"\b(\d+(?:\.\d+)?)\b")
-        for match in score_pattern.finditer(parsed.summary):
+        for match in score_pattern.finditer(clean_summary):
             val = float(match.group(1))
             # Only flag large discrepancies (>5 points) to avoid false positives
             if 1 < val <= 100 and abs(val - risk_score) > 5:
